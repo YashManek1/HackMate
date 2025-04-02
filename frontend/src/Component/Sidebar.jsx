@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import "../Styles/Sidebar.css";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   FiBarChart,
   FiChevronDown,
@@ -15,15 +17,21 @@ import { motion } from "framer-motion";
 export const Sidebar = () => {
   return (
     <div className="flex bg-[#f6ebff]">
-      <Sidebarleft />
-      <ExampleContent />
+      <SidebarLeft />
     </div>
   );
 };
 
-const Sidebarleft = () => {
+const SidebarLeft = () => {
   const [open, setOpen] = useState(true);
-  const [selected, setSelected] = useState("Dashboard");
+  const location = useLocation();
+  const currentPath = location.pathname.split('/').pop();
+  
+  // Default to 'dashboard' if on root dashboard route
+  const [selected, setSelected] = useState(
+    currentPath === 'dashboard' ? 'Dashboard' : 
+    currentPath.charAt(0).toUpperCase() + currentPath.slice(1) || 'Dashboard'
+  );
 
   return (
     <motion.nav
@@ -40,6 +48,15 @@ const Sidebarleft = () => {
         <Option
           Icon={FiHome}
           title="Dashboard"
+          path="/dashboard"
+          selected={selected}
+          setSelected={setSelected}
+          open={open}
+        />
+        <Option
+          Icon={FiUsers}
+          title="Community"
+          path="/dashboard/community"
           selected={selected}
           setSelected={setSelected}
           open={open}
@@ -47,6 +64,7 @@ const Sidebarleft = () => {
         <Option
           Icon={FiDollarSign}
           title="Sales"
+          path="/dashboard/sales"
           selected={selected}
           setSelected={setSelected}
           open={open}
@@ -55,6 +73,7 @@ const Sidebarleft = () => {
         <Option
           Icon={FiMonitor}
           title="View Site"
+          path="/dashboard/view"
           selected={selected}
           setSelected={setSelected}
           open={open}
@@ -62,6 +81,7 @@ const Sidebarleft = () => {
         <Option
           Icon={FiShoppingCart}
           title="Products"
+          path="/dashboard/products"
           selected={selected}
           setSelected={setSelected}
           open={open}
@@ -69,6 +89,7 @@ const Sidebarleft = () => {
         <Option
           Icon={FiTag}
           title="Tags"
+          path="/dashboard/tags"
           selected={selected}
           setSelected={setSelected}
           open={open}
@@ -76,13 +97,7 @@ const Sidebarleft = () => {
         <Option
           Icon={FiBarChart}
           title="Analytics"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-        />
-        <Option
-          Icon={FiUsers}
-          title="Members"
+          path="/dashboard/analytics"
           selected={selected}
           setSelected={setSelected}
           open={open}
@@ -94,11 +109,18 @@ const Sidebarleft = () => {
   );
 };
 
-const Option = ({ Icon, title, selected, setSelected, open, notifs }) => {
+const Option = ({ Icon, title, path, selected, setSelected, open, notifs }) => {
+  const navigate = useNavigate();
+  
+  const handleClick = () => {
+    setSelected(title);
+    navigate(path);
+  };
+  
   return (
     <motion.button
       layout
-      onClick={() => setSelected(title)}
+      onClick={handleClick}
       className={`relative flex h-10 w-full items-center rounded-md transition-colors font-medium ${
         selected === title 
           ? "bg-[#f6ebff] text-[#340062]" 
@@ -226,5 +248,3 @@ const ToggleClose = ({ open, setOpen }) => {
     </motion.button>
   );
 };
-
-const ExampleContent = () => <div className="h-[200vh] w-full"></div>;
