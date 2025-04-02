@@ -4,7 +4,6 @@ import Header from './Header';
 
 const Home = () => {
   return (
-<<<<<<< HEAD
     <div className='h-max w-full max-w-full p-4 flex items-center justify-around flex-row flex-wrap'>
       <Header />
       
@@ -20,9 +19,6 @@ const Home = () => {
           className='absolute top-0 left-0 z-0'
           />
       </div>
-=======
-    <div>
->>>>>>> 6f9e187bde1d94e44846e6f952e1ee8689bcd91c
     </div>
   )
 }
