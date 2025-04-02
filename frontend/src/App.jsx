@@ -3,7 +3,8 @@ import { Routes, Route } from 'react-router-dom'
 import NotFound from './Pages/NotFound'
 import Home from './Pages/Landing/Home'
 import DashApp from './Pages/Dashboard_/DashApp'
-import SignUp from "./Pages/Signup.jsx"
+import SignUpPage from "./Pages/SignUpPage.jsx"
+import LoginPage from './Pages/Landing/LoginPage.jsx'
 
 const App = () => {
   return (
@@ -12,7 +13,8 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/dashboard/*" element={<DashApp/>} />
         <Route path="*" element={<NotFound />} />
-        <Route path="/signup" element={<SignUp />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/login" element={<LoginPage />} />
       </Routes>
     </div>
   )
