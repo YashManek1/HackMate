@@ -39,3 +39,18 @@ const uploadToCloudinary = async (fileBuffer: Buffer, folder: string) => {
 };
 
 export { upload, uploadToCloudinary };
+
+/* router.post("/upload", upload.single("profilePhoto"), async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+  
+    try {
+      const result = await uploadToCloudinary(req.file.buffer, "hackmate");
+      return res.json({ url: result.secure_url });
+    } catch (error) {
+      return res.status(500).json({ error: "Upload failed" });
+    }
+  });
+  
+  export default router; */
