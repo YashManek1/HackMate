@@ -10,7 +10,9 @@
 
 @theme {
   --color-light-primary: #f6ebff;
-  --color-light-secondary: #b6cbff;
+  --color-light-secondary1: #b6cbff;
+  --color-light-secondary2: #FFFFFF;
   --color-dark-primary: #340062;
-  --color-dark-secondary: #11014c;
+  --color-dark-secondary1: #11014c;
+  --color-dark-secondary2: #000000;
 }
