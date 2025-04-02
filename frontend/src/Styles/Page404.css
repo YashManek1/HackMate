@@ -5,7 +5,7 @@
   }
   
   body {
-    font-family: 'Arvo', serif;
+    font-family: "DM Sans", sans-serif;
     background: #fff;
     height: 100vh;
     overflow: hidden;
@@ -46,9 +46,10 @@
   /* 404 text styling - positioned above the image */
   .error_heading h1 {
     font-size: 80px;
-    color: #3f3f3f;
+    color: #340062; /* Changed to dark-primary color */
     margin-bottom: 5px;
     line-height: 1;
+    font-family: "DM Sans", sans-serif;
   }
   
   /* Image container styling */
@@ -65,31 +66,34 @@
   .contant_box_404 h3 {
     font-size: 28px;
     margin-bottom: 10px;
-    color: #3f3f3f;
+    color: #340062; /* Changed to dark-primary color */
+    font-family: "DM Sans", sans-serif;
   }
   
   .contant_box_404 p {
     font-size: 16px;
     margin-bottom: 15px;
-    color: #666;
+    color: #11014c; /* Changed to dark-secondary color */
+    font-family: "DM Sans", sans-serif;
   }
   
   .link_404 {
     color: #fff;
     text-decoration: none;
     padding: 12px 25px;
-    background: #39ac31;
+    background: #340062; /* Changed to dark-primary color */
     border-radius: 5px;
     display: inline-block;
     transition: all 0.3s ease;
     font-weight: bold;
     font-size: 16px;
+    font-family: "DM Sans", sans-serif;
   }
   
   .link_404:hover {
-    background: #2d8a27;
+    background: #11014c; /* Changed to dark-secondary color */
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgba(52, 0, 98, 0.3); /* Updated shadow color to match theme */
   }
   
   /* Media queries for responsiveness */
