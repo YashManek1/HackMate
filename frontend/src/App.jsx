@@ -4,11 +4,11 @@ import NotFound from './Pages/NotFound'
 import Home from './Pages/Landing/Home'
 import DashApp from './Pages/Dashboard_/DashApp'
 import SignUpPage from "./Pages/SignUpPage.jsx"
-import LoginPage from './Pages/Landing/LoginPage.jsx'
+import LoginPage from './Pages/LoginPage.jsx'
 
 const App = () => {
   return (
-    <div className='min-h-screen max-w-screen m-0 p-0 overflow-x-hidden overflow-y-auto transition-all scroll-smooth'>
+    <div className='min-h-screen max-w-screen m-0 p-0 overflow-x-hidden overflow-y-auto relative transition-all scroll-smooth'>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard/*" element={<DashApp/>} />
