@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, ArrowRight, Mail, Lock, User, Github } from 'lucide-react';
-
+import { Link } from 'react-router-dom';
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
@@ -185,7 +185,7 @@ const LoginPage = () => {
               transition={{ delay: 0.8 }}
               className="text-center text-base text-white mt-10"
             >
-              Don't have an account? <a href="#" className="text-white font-semibold hover:text-purple-200 transition-colors">Sign up</a>
+              Don't have an account? <Link to="/signup" className="text-white font-semibold hover:text-purple-200 transition-colors">Sign up</Link>
             </motion.p>
           </div>
         </motion.div>

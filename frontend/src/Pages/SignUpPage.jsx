@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, ArrowRight, Mail, Lock, User, Github, Check, X } from 'lucide-react';
-
+import {Link } from 'react-router-dom';
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeStep, setActiveStep] = useState(1);
@@ -75,7 +75,7 @@ const SignUpPage = () => {
           <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-full bg-gradient-to-r from-white to-purple-200 flex items-center justify-center mr-3 shadow-lg">
             <div className="w-4 sm:w-5 h-4 sm:h-5 bg-purple-600 rounded-full"></div>
           </div>
-          <span className="font-extrabold text-xl sm:text-2xl tracking-tight">OnlyRipe</span>
+          <span className="font-extrabold text-xl sm:text-2xl tracking-tight">HackMate</span>
         </motion.div>
         
         {/* Intro Text */}
@@ -345,7 +345,7 @@ const SignUpPage = () => {
             transition={{ delay: 0.9 }}
             className="text-center text-sm sm:text-base text-gray-400 mt-8 sm:mt-10 lg:mt-12"
           >
-            Already have an account? <a href="#" className="text-purple-400 font-semibold hover:text-purple-300 transition-colors">Log in</a>
+            Already have an account? <Link to="/login" className="text-purple-400 font-semibold hover:text-purple-300 transition-colors">Log in</Link>
           </motion.p>
         </div>
       </motion.div>
