@@ -10,7 +10,7 @@ const Home = () => {
       <div className='container mx-auto h-screen flex items-center relative px-6'>
         {/* Left content section */}
         <div className='w-full md:w-1/2 z-10 pr-4'>
-          <h1 className='text-4xl md:text-6xl lg:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-light-secondary1 to-light-primary'>
+          <h1 className='text-5xl md:text-6xl lg:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-light-secondary1 to-light-primary'>
             HackMate
           </h1>
           
