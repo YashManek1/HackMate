@@ -50,7 +50,7 @@ const LoginPage = () => {
               <div className="w-12 h-12 rounded-full bg-gradient-to-r from-white to-purple-200 flex items-center justify-center mr-3 shadow-lg">
                 <div className="w-5 h-5 bg-purple-600 rounded-full"></div>
               </div>
-              <span className="font-extrabold text-2xl tracking-tight text-white">OnlyRipe</span>
+              <span className="font-extrabold text-2xl tracking-tight text-white">HackMate</span>
             </motion.div>
 
             <motion.div
