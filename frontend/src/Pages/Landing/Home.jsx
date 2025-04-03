@@ -4,13 +4,13 @@ import Header from './Header';
 
 const Home = () => {
   return (
-    <div className='min-h-screen w-full bg-gradient-to-br from-gray-900 to-black text-white'>
+    <div className='min-h-screen w-full bg-gradient-to-t from-dark-secondary1 to-dark-primary text-white'>
       <Header />
       
       <div className='container mx-auto h-screen flex items-center relative px-6'>
         {/* Left content section */}
         <div className='w-full md:w-1/2 z-10 pr-4'>
-          <h1 className='text-4xl md:text-6xl lg:text-8xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600'>
+          <h1 className='text-4xl md:text-6xl lg:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-light-secondary1 to-light-primary'>
             HackMate
           </h1>
           
@@ -23,22 +23,7 @@ const Home = () => {
               Supercharge your hackathon projects with intelligent assistance, real-time collaboration, and powerful code generation.
             </p>
             
-            <ul className='space-y-2'>
-              <li className='flex items-center'>
-                <span className='mr-2 text-green-400'>✓</span> 
-                <span>Smart code completion and suggestions</span>
-              </li>
-              <li className='flex items-center'>
-                <span className='mr-2 text-green-400'>✓</span> 
-                <span>Project management and team coordination</span>
-              </li>
-              <li className='flex items-center'>
-                <span className='mr-2 text-green-400'>✓</span> 
-                <span>24/7 technical support and debugging</span>
-              </li>
-            </ul>
-            
-            <button className='bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 px-10 rounded-lg mt-6 transition-all'>
+            <button className='bg-white text-dark-primary font-bold py-3 px-6 rounded-xl mt-6 transition-all'>
               Get Started
             </button>
           </div>
