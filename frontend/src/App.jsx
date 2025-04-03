@@ -6,6 +6,8 @@ import DashApp from './Pages/Dashboard_/DashApp'
 import SignUpPage from "./Pages/SignUpPage.jsx"
 import LoginPage from './Pages/LoginPage.jsx'
 import ScrollToTop from "./ScrollToTop.jsx"
+import Resources from '../../frontend/src/Pages/Dashboard_/Resources.jsx'
+import ResourcePage from '../../frontend/src/Pages/Dashboard_/ResourcePage.jsx' // Added import for ResourcePage
 
 const App = () => {
   return (
@@ -16,6 +18,8 @@ const App = () => {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard/*" element={<DashApp/>} />
+        <Route path="/dashboard/resources" element={<Resources/>} />
+        <Route path="/dashboard/resources/:slug" element={<ResourcePage />} /> {/* Added dynamic route */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

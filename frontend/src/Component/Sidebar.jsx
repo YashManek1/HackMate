@@ -1,3 +1,4 @@
+// src/Sidebar.jsx
 import React, { useState } from "react";
 import "../Styles/Sidebar.css";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -25,12 +26,13 @@ export const Sidebar = () => {
 const SidebarLeft = () => {
   const [open, setOpen] = useState(true);
   const location = useLocation();
-  const currentPath = location.pathname.split('/').pop();
-  
-  // Default to 'dashboard' if on root dashboard route
+  const currentPath = location.pathname;
+
+  // Highlight "Resources" for /dashboard/resources and /dashboard/resources/*
   const [selected, setSelected] = useState(
-    currentPath === 'dashboard' ? 'Dashboard' : 
-    currentPath.charAt(0).toUpperCase() + currentPath.slice(1) || 'Dashboard'
+    currentPath.includes("/dashboard/resources") ? "Resources" :
+    currentPath === "/dashboard" ? "Dashboard" :
+    currentPath.split("/").pop().charAt(0).toUpperCase() + currentPath.split("/").pop().slice(1) || "Dashboard"
   );
 
   return (
@@ -63,12 +65,11 @@ const SidebarLeft = () => {
         />
         <Option
           Icon={FiDollarSign}
-          title="Sales"
-          path="/dashboard/sales"
+          title="Resources"
+          path="/dashboard/resources"
           selected={selected}
           setSelected={setSelected}
           open={open}
-          notifs={3}
         />
         <Option
           Icon={FiMonitor}
@@ -248,3 +249,5 @@ const ToggleClose = ({ open, setOpen }) => {
     </motion.button>
   );
 };
+
+export default Sidebar;
