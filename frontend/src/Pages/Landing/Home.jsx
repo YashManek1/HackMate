@@ -3,6 +3,7 @@ import Header from './Header';
 import HeroSection from './HeroSection';
 import Features from './Features'
 import Footer from './Footer';
+import FlowTimeLine from './FlowTimeLine';
 
 const Home = () => {
   return (
@@ -10,7 +11,7 @@ const Home = () => {
       <Header />
       <HeroSection />
       <Features />
-      
+      <FlowTimeLine />
       <Footer />
     </div>
   )

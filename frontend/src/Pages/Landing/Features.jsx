@@ -57,7 +57,7 @@ const features = [
 const Features = () => {
   return (
     <div className="h-max w-full max-w-full px-10 py-10 bg-light-primary">
-      <h1 className="h-max w-full text-left text-4xl md:text-4xl lg:text-6xl font-bold font-dmsans m-1">
+      <h1 className="h-max w-full text-left text-4xl md:text-4xl lg:text-6xl font-bold font-dmsans m-1 text-dark-primary">
         Features
       </h1>
         

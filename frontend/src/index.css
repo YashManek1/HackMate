@@ -53,3 +53,33 @@ body::-webkit-scrollbar-thumb {
                      var(--sb-track-color);
   }
 }
+
+
+
+#scrollbar {
+  --sb-track-color: #FFFFFF;
+  --sb-thumb-color: #11014c;
+  --sb-size: 10px;
+}
+
+#scrollbar::-webkit-scrollbar {
+  width: var(--sb-size)
+}
+
+#scrollbar::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 1px;
+}
+
+#scrollbar::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 5px;
+  
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  #scrollbar {
+    scrollbar-color: var(--sb-thumb-color)
+                     var(--sb-track-color);
+  }
+}
