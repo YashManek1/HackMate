@@ -63,6 +63,14 @@ model User {
   mentorshipsGiven       Mentorship[]             @relation("MentorshipsGiven")
   mentorshipsReceived    Mentorship[]             @relation("MentorshipsReceived")
   EventLog               EventLog[]
+
+  password           String? // For normal signup/login
+  googleId           String?   @unique // For Google OAuth
+  refreshToken       String? // For session management
+  isEmailVerified    Boolean   @default(false) // Email verification
+  status             String    @default("active") // Account status
+  lastLogin          DateTime? // Track user activity
+  aiInteractionPrefs Json? // Customize AI interaction
 }
 
 model Skill {
@@ -247,8 +255,9 @@ model ProjectMember {
 }
 
 enum ProjectRole {
-  LEAD_DEVELOPER
-  DEVELOPER
+  BACKEND_DEVELOPER
+  FULLSTACK_DEVELOPER
+  FRONTEND_DEVELOPER
   DESIGNER
   RESEARCHER
   CONTRIBUTOR

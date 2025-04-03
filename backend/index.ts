@@ -1,29 +1,49 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import passport from "passport";
+import session from "express-session";
+import cookieParser from "cookie-parser";
+import { authConfig } from "./config/auth";
+import authRoutes from "./routes/authRoutes";
+import userRoutes from "./routes/userRoutes";
+import { errorMiddleware } from "./middlewares/errorMiddleware";
+import "./utils/passport"; 
 
 dotenv.config();
 
 const prisma = new PrismaClient();
-
 const app = express();
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
 
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cors({ origin: "*", credentials: true }));
+app.use(cookieParser());
 app.use(
-  cors({
-    origin: "*",
-    credentials: true,
+  session({
+    secret: "your_secret_key",
+    resave: false,
+    saveUninitialized: false,
   })
 );
+app.use(passport.initialize());
+app.use(passport.session());
 
+// Routes
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
 
+app.use("/auth", authRoutes);
+app.use("/users", userRoutes);
+
+// Error handling
+app.use(errorMiddleware);
+
+// Graceful shutdown
 process.on("SIGINT", async () => {
   await prisma.$disconnect();
   process.exit(0);
@@ -32,4 +52,5 @@ process.on("SIGINT", async () => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
 export { app };
