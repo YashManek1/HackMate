@@ -9,10 +9,11 @@ import {
 } from "passport-github2";
 import { PrismaClient, User } from "@prisma/client";
 import { authConfig } from "../config/auth";
+import { Request } from "express";
+import { encrypt } from "../utils/crypto";
 
 const prisma = new PrismaClient();
 
-// Explicitly define the type for Passport's done callback
 type VerifyCallback = (error: any, user?: User | false) => void;
 
 // Serialize User
@@ -48,16 +49,54 @@ passport.use(
       done: VerifyCallback
     ) => {
       try {
+        const encryptedAccessToken = encrypt(accessToken);
+        const encryptedRefreshToken = refreshToken
+          ? encrypt(refreshToken)
+          : null;
+
+        const email = profile.emails?.[0]?.value || "default@example.com";
+        const name = profile.displayName || "Unknown";
+        const avatarUrl = profile.photos?.[0]?.value || null;
+        const googleId = profile.id;
+
+        const json = profile._json as any;
+        // Extract other available info if present
+        const bio = json.ne || json.tagline || null;
+        const timeZone = json.timeZone || null;
+        const googleProfileUrl = json.url || null;
+
         let user = await prisma.user.findUnique({
-          where: { googleId: profile.id },
+          where: { googleId },
         });
 
         if (!user) {
           user = await prisma.user.create({
             data: {
-              googleId: profile.id,
-              email: profile.emails?.[0]?.value || "default@example.com",
-              name: profile.displayName || "Unknown",
+              googleId,
+              email,
+              name,
+              avatarUrl,
+              bio,
+              timeZone,
+              portfolioUrl: googleProfileUrl, // Optional, if you want
+              googleAccessToken: encryptedAccessToken,
+              googleRefreshToken: encryptedRefreshToken,
+              isEmailVerified: true,
+              lastLogin: new Date(),
+              interests: [], // Empty array as default
+              status: "active",
+            },
+          });
+        } else {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              avatarUrl,
+              bio,
+              timeZone,
+              googleAccessToken: encryptedAccessToken,
+              googleRefreshToken: encryptedRefreshToken,
+              lastLogin: new Date(),
             },
           });
         }
@@ -77,9 +116,11 @@ passport.use(
       clientID: authConfig.github.clientID,
       clientSecret: authConfig.github.clientSecret,
       callbackURL: authConfig.github.callbackURL,
-      passReqToCallback: false,
+      passReqToCallback: true,
+      scope: ["user:email", "read:user", "repo"],
     },
     async (
+      req: Request,
       accessToken: string,
       refreshToken: string | undefined,
       profile: GitHubProfile,
@@ -96,11 +137,18 @@ passport.use(
               githubId: profile.id,
               email: profile.emails?.[0]?.value || "default@example.com",
               name: profile.displayName || profile.username || "Unknown",
+              avatarUrl: profile.photos?.[0]?.value,
+              role: "PARTICIPANT",
+              isEmailVerified: true,
+              status: "active",
             },
           });
         }
 
-        done(null, user);
+        (user as any).gitHubAccessToken = accessToken;
+        (user as any).gitHubRefreshToken = refreshToken;
+
+        return done(null, user);
       } catch (error) {
         done(error, false);
       }

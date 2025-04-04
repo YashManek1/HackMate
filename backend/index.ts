@@ -9,7 +9,7 @@ import { authConfig } from "./config/auth";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import { errorMiddleware } from "./middlewares/errorMiddleware";
-import "./utils/passport"; 
+import "./utils/passport";
 
 dotenv.config();
 

@@ -2,7 +2,10 @@
 import { Request, Response, NextFunction } from "express";
 import { authService } from "../services/authService";
 import passport from "passport";
-import { User } from "@prisma/client"; // Import User type from Prisma
+import { User, PrismaClient } from "@prisma/client"; // Import User type from Prisma
+import { encrypt } from "../utils/crypto";
+
+const prisma = new PrismaClient();
 
 class AuthController {
   async signup(req: Request, res: Response, next: NextFunction) {
@@ -68,9 +71,20 @@ class AuthController {
       { session: false },
       async (err: Error | null, user: User | false | null) => {
         if (err || !user) return next(err || new Error("Google auth failed"));
-        const { accessToken, refreshToken } = await authService.generateTokens(
+
+        let { accessToken, refreshToken } = await authService.generateTokens(
           user
         );
+        accessToken = encrypt(accessToken);
+        refreshToken = encrypt(refreshToken);
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            refreshToken,
+            lastLogin: new Date(),
+          },
+        });
+
         res.redirect(
           `/auth/success?accessToken=${accessToken}&refreshToken=${refreshToken}`
         );
@@ -86,13 +100,41 @@ class AuthController {
     passport.authenticate(
       "github",
       { session: false },
-      async (err: Error | null, user: User | false | null) => {
+      async (
+        err: Error | null,
+        user: User | false | null,
+        info: { accessToken?: string; refreshToken?: string }
+      ) => {
         if (err || !user) return next(err || new Error("GitHub auth failed"));
+
+        const githubAccessToken = info?.accessToken;
+        const githubRefreshToken = info?.refreshToken;
+
+        const encryptedAccessToken = githubAccessToken
+          ? encrypt(githubAccessToken)
+          : null;
+        const encryptedRefreshToken = githubRefreshToken
+          ? encrypt(githubRefreshToken)
+          : null;
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            gitHubAccessToken: encryptedAccessToken,
+            gitHubRefreshToken: encryptedRefreshToken,
+          },
+        });
+
         const { accessToken, refreshToken } = await authService.generateTokens(
           user
         );
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { refreshToken },
+        });
+
         res.redirect(
-          `/auth/success?accessToken=${accessToken}&refreshToken=${refreshToken}`
+          `http://localhost:3000/auth/success?accessToken=${accessToken}&refreshToken=${refreshToken}`
         );
       }
     )(req, res, next);

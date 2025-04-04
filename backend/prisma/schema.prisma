@@ -64,6 +64,12 @@ model User {
   mentorshipsReceived    Mentorship[]             @relation("MentorshipsReceived")
   EventLog               EventLog[]
 
+  gitHubAccessToken  String? @db.Text // For GitHub API access
+  gitHubRefreshToken String? @db.Text // For GitHub API access
+
+  googleAccessToken  String? @db.Text // For Google API access
+  googleRefreshToken String? @db.Text // For Google API access
+
   password           String? // For normal signup/login
   googleId           String?   @unique // For Google OAuth
   refreshToken       String? // For session management
