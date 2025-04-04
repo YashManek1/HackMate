@@ -5,11 +5,14 @@ import dotenv from "dotenv";
 import passport from "passport";
 import session from "express-session";
 import cookieParser from "cookie-parser";
-import { authConfig } from "./config/auth";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
+import githubRoutes from "./routes/githubRoutes";
+
 import { errorMiddleware } from "./middlewares/errorMiddleware";
 import "./utils/passport";
+
+import "./jobs/githubSyncJob";
 
 dotenv.config();
 
@@ -39,6 +42,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
+app.use("/github", githubRoutes);
 
 // Error handling
 app.use(errorMiddleware);

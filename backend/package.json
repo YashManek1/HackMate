@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/axios": "^0.9.36",
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
@@ -22,6 +23,7 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/multer": "^1.4.12",
     "@types/node": "^20.17.30",
+    "@types/node-cron": "^3.0.11",
     "@types/passport": "^1.0.17",
     "@types/passport-github2": "^1.2.9",
     "@types/passport-google-oauth20": "^2.0.16",
@@ -34,6 +36,7 @@
   "dependencies": {
     "@prisma/client": "^6.5.0",
     "@supabase/supabase-js": "^2.49.4",
+    "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.6.0",
     "cookie-parser": "^1.4.7",
@@ -45,6 +48,7 @@
     "jsonwebtoken": "^9.0.2",
     "moment-timezone": "^0.5.48",
     "multer": "^1.4.5-lts.2",
+    "node-cron": "^3.0.3",
     "nodemon": "^3.1.9",
     "passport": "^0.6.0",
     "passport-github2": "^0.1.12",
