@@ -3,6 +3,7 @@ import { Sidebar } from '../../Component/Sidebar';
 import Community from './Community';
 import Dashboard from './Dashboard';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import Profile from './Profile/Profile';
 
 const DashApp = () => {
   return (
@@ -18,17 +19,9 @@ const DashApp = () => {
           {/* Default route - redirect to dashboard */}
           <Route index element={<Dashboard />} />
           
-          {/* Dashboard routes */}
-          <Route path="community" element={<Community />} />
-          {/* Add these routes as you create the components */}
-          <Route path="resources" element={<div className="p-6"><h1 className="text-2xl font-bold">resources Dashboard</h1></div>} />
-          <Route path="view" element={<div className="p-6"><h1 className="text-2xl font-bold">Site Preview</h1></div>} />
-          <Route path="products" element={<div className="p-6"><h1 className="text-2xl font-bold">Products Management</h1></div>} />
-          <Route path="tags" element={<div className="p-6"><h1 className="text-2xl font-bold">Tags Management</h1></div>} />
-          <Route path="analytics" element={<div className="p-6"><h1 className="text-2xl font-bold">Analytics Dashboard</h1></div>} />
+          <Route path="community" element={<Community />} />          
+          <Route path="profile" element={<Profile />} />          
           
-          {/* Fallback for any undefined dashboard routes */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </div>
     </div>
