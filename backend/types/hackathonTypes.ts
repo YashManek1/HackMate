@@ -1,7 +1,6 @@
 // src/types/hackathonTypes.ts
 
 export interface HackathonInput {
-  teamId: string;
   name: string;
   description?: string;
   startDate: string; // ISO string
@@ -9,7 +8,7 @@ export interface HackathonInput {
   location?: string;
   rules?: string;
   prizeDetails?: Record<string, any>;
-  themes: string[];
+  domains: string[];
   timeline: {
     eventName: string;
     eventTime: string; // ISO string

@@ -10,7 +10,7 @@ export async function extractHackathonData(html: string) {
   const prompt = `
 You are an AI that extracts structured data from hackathon HTML content.
 
-From the following HTML content, extract a JSON object with this strict format:
+From the following HTML content, extract a JSON object with this exact structure:
 
 {
   "name": string,
@@ -20,7 +20,7 @@ From the following HTML content, extract a JSON object with this strict format:
   "location": string,
   "rules": string,
   "prizeDetails": object,
-  "themes": string[],
+  "domains": string[], // this field should represent the domain, tracks, or themes of the hackathon
   "timeline": [
     {
       "eventName": string,
@@ -30,7 +30,29 @@ From the following HTML content, extract a JSON object with this strict format:
   ]
 }
 
-ONLY return JSON. No explanations or extra text.
+Instructions:
+
+- The "domains" field should contain an array of the **tracks, domains, themes, focus areas, or challenge categories** of the hackathon.
+- These could be labeled in the HTML as:
+  - "Tracks"
+  - "Themes"
+  - "Problem Statements"
+  - "Domains"
+  - "Focus Areas"
+  - "Challenge Areas"
+  - "What You Can Build"
+  - "Categories"
+  - or any heading or list that hints at areas of innovation or project directions.
+
+- Examples of valid values include:
+  "Web Development", "Artificial Intelligence", "Healthcare", "Sustainability", "Cybersecurity", "Blockchain", "Open Innovation", "Fintech", "IoT", "EdTech", etc.
+
+- Even if there is no direct label like "Tracks" or "Themes", infer them intelligently from context — especially if multiple similar phrases are grouped or listed.
+- If the page has sections that clearly list tech domains or innovation categories (such as bullet points or headings), extract those even if they’re not labeled under a common term.
+
+Your goal is to intelligently find **any section that represents what participants are expected to build** and extract that into the "themes" array.
+
+Only return pure JSON. No extra explanation, no markdown.
 `;
 
   try {
