@@ -9,6 +9,7 @@ import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import hackathonRoutes from "./routes/hackathonRoutes";
 import githubRoutes from "./routes/githubRoutes";
+import teamRoutes from './routes/teamRoutes';
 
 import { errorMiddleware } from "./middlewares/errorMiddleware";
 import "./utils/passport";
@@ -45,6 +46,7 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/github", githubRoutes);
 app.use("/hackathon", hackathonRoutes);
+app.use('/api/teams', teamRoutes);
 
 // Error handling
 app.use(errorMiddleware);

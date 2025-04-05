@@ -72,6 +72,7 @@ model Team {
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
   leaderId          String
+  teamCode          String       @unique // Added field for team code
   hackathon         Hackathon?
   project           Project?
   tasks             Task[]       @relation("TeamTasks")
@@ -86,8 +87,8 @@ model Hackathon {
   team         Team?              @relation(fields: [teamId], references: [id], onDelete: Cascade)
   name         String
   description  String?
-  startDate    DateTime
-  endDate      DateTime
+  startDate    String
+  endDate      String
   location     String?
   rules        String?
   prizeDetails Json?
@@ -95,9 +96,6 @@ model Hackathon {
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
   aiInsights   Json?
-  domains      String[]
-  teamId       String?             @unique
-  team         Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
   timeline     HackathonTimeline[] @relation("HackathonTimeline")
   users        User[]              @relation("UserHackathons")
 }
