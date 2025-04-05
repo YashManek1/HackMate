@@ -9,6 +9,17 @@
   background-color: #f6ebff;
 }
 
+.sticky {
+  backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.resource-card {
+  will-change: transform;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
 /* Truncate description text to 3 lines */
 .line-clamp-3 {
   display: -webkit-box;
