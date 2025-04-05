@@ -82,8 +82,8 @@ model Team {
 
 model Hackathon {
   id           String              @id @default(uuid())
-  teamId       String?             @unique
-  team         Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId       String?              @unique
+  team         Team?              @relation(fields: [teamId], references: [id], onDelete: Cascade)
   name         String
   description  String?
   startDate    DateTime
@@ -91,7 +91,7 @@ model Hackathon {
   location     String?
   rules        String?
   prizeDetails Json?
-  domains      String[]
+  domains       String[]
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
   aiInsights   Json?
