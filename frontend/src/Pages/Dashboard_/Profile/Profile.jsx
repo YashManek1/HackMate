@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ProfileSection from './ProfileSection';
 import FormModal from './FormModal';
+import SkillsTab from './TabComponents/SkillsTab';
+import SocialLinksTab from './TabComponents/SocialLinksTab';
+import TaglineTab from './TabComponents/TagLineTab';
 
 const Profile = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -9,6 +12,8 @@ const Profile = () => {
   const [editData, setEditData] = useState(null);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [deleteInfo, setDeleteInfo] = useState({ type: '', index: -1 });
+  const [currentUser] = useState('tanishshah20');
+  const [currentDate] = useState('2025-04-05');
   
   // State to store data for each tab
   const [profileData, setProfileData] = useState({
@@ -17,33 +22,73 @@ const Profile = () => {
     'Position of Responsibility': [],
     'Work Experience': [],
     Achievements: [],
-    Certifications: []
+    Certifications: [],
+    Skills: [], 
+    'Social Links': {},
+    'Hackathon Preferences': {},
+    Tagline: ''
   });
   
+  // Predefined list of common skills 
+  const predefinedSkills = [
+    'JavaScript', 'React', 'Node.js', 'CSS', 'HTML', 'Python', 'Java', 'C++', 
+    'TypeScript', 'Angular', 'Vue.js', 'Redux', 'Express', 'MongoDB', 'SQL', 
+    'PostgreSQL', 'Firebase', 'AWS', 'Docker', 'Kubernetes', 'Git', 'REST API',
+    'GraphQL', 'Agile', 'Scrum', 'TDD', 'CI/CD', 'DevOps', 'Machine Learning',
+    'Data Science', 'Blockchain', 'UI/UX Design', 'Figma', 'Adobe XD', 
+    'Responsive Design', 'Mobile Development', 'React Native', 'Flutter',
+    'Swift', 'Kotlin', 'SEO', 'Data Analysis', 'Testing', 'Jest', 'Mocha',
+    'TensorFlow', 'PyTorch', 'Natural Language Processing', 'Computer Vision',
+    'Reinforcement Learning', 'Data Visualization', 'D3.js', 'Tableau',
+    'AR/VR', 'Unity', 'Three.js', 'WebGL', 'Embedded Systems', 'IoT',
+    'Cybersecurity', 'Ethical Hacking', 'Cryptography'
+  ];
+  
+  // Function to load saved data from local storage
+  useEffect(() => {
+    try {
+      const savedData = localStorage.getItem(`profileData_${currentUser}`);
+      if (savedData) {
+        setProfileData(JSON.parse(savedData));
+      }
+    } catch (error) {
+      console.error("Error loading from localStorage:", error);
+    }
+  }, [currentUser]); // Only run once on component mount
+  
+  // Function to save data to local storage when it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(`profileData_${currentUser}`, JSON.stringify(profileData));
+    } catch (error) {
+      console.error("Error saving to localStorage:", error);
+    }
+  }, [profileData, currentUser]); // Only run when profileData changes
+  
   // Function to open modal with specific type for adding new entry
-  const openModalWithType = (type) => {
+  const openModalWithType = useCallback((type) => {
     setModalType(type);
     setEditIndex(-1);
     setEditData(null);
     setModalOpen(true);
-  };
+  }, []);
   
   // Function to open modal for editing an existing entry
-  const openEditModal = (type, index, data) => {
+  const openEditModal = useCallback((type, index, data) => {
     setModalType(type);
     setEditIndex(index);
     setEditData(data);
     setModalOpen(true);
-  };
+  }, []);
   
   // Function to open delete confirmation modal
-  const openDeleteConfirm = (type, index) => {
+  const openDeleteConfirm = useCallback((type, index) => {
     setDeleteInfo({ type, index });
     setConfirmDeleteOpen(true);
-  };
+  }, []);
   
   // Function to handle deletion of an entry
-  const handleDeleteEntry = () => {
+  const handleDeleteEntry = useCallback(() => {
     const { type, index } = deleteInfo;
     
     setProfileData(prevData => {
@@ -56,11 +101,23 @@ const Profile = () => {
     });
     
     setConfirmDeleteOpen(false);
-  };
+  }, [deleteInfo]);
   
   // Function to handle saving form data
-  const handleSaveData = (type, newData) => {
-    if (editIndex >= 0) {
+  const handleSaveData = useCallback((type, newData) => {
+    if (type === 'Social Links' || type === 'Hackathon Preferences') {
+      // For social links and hackathon preferences, replace the entire object
+      setProfileData(prevData => ({
+        ...prevData,
+        [type]: newData
+      }));
+    } else if (type === 'Tagline') {
+      // For tagline, just update the string
+      setProfileData(prevData => ({
+        ...prevData,
+        Tagline: newData
+      }));
+    } else if (editIndex >= 0) {
       // Editing existing entry
       setProfileData(prevData => {
         const updatedData = [...prevData[type]];
@@ -80,7 +137,36 @@ const Profile = () => {
     setModalOpen(false);
     setEditIndex(-1);
     setEditData(null);
-  };
+  }, [editIndex]);
+  
+  // Function to edit tagline
+  const handleEditTagline = useCallback(() => {
+    setModalType('Tagline');
+    setEditData(profileData.Tagline);
+    setModalOpen(true);
+  }, [profileData.Tagline]);
+  
+  // Function to add a skill
+  const addSkill = useCallback((skill) => {
+    if (!profileData.Skills.includes(skill) && skill.trim() !== '') {
+      setProfileData(prevData => ({
+        ...prevData,
+        Skills: [...prevData.Skills, skill]
+      }));
+    }
+  }, [profileData.Skills]);
+  
+  // Function to delete a skill
+  const deleteSkill = useCallback((skillIndex) => {
+    setProfileData(prevData => {
+      const updatedSkills = [...prevData.Skills];
+      updatedSkills.splice(skillIndex, 1);
+      return {
+        ...prevData,
+        Skills: updatedSkills
+      };
+    });
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -90,7 +176,29 @@ const Profile = () => {
         onEditItem={openEditModal}
         onDeleteItem={openDeleteConfirm}
         profileData={profileData}
+        username={currentUser}
+        predefinedSkills={predefinedSkills}
       />
+      
+      {/* Reorganized Content Area - TagLine, Skills, and Social Links */}
+      <div className="mt-6">
+        <TaglineTab 
+          tagline={profileData.Tagline}
+          onEditTagline={handleEditTagline}
+        />
+        
+        <SkillsTab 
+          skills={profileData.Skills}
+          addSkill={addSkill}
+          deleteSkill={deleteSkill}
+          predefinedSkills={predefinedSkills}
+        />
+        
+        <SocialLinksTab 
+          socialLinks={profileData['Social Links']}
+          onOpenModal={openModalWithType}
+        />
+      </div>
       
       {/* Reusable Modal */}
       <FormModal 
@@ -102,8 +210,9 @@ const Profile = () => {
         }} 
         modalType={modalType}
         editData={editData}
-        isEditing={editIndex >= 0}
+        isEditing={modalType === 'Tagline' ? Boolean(editData) : editIndex >= 0}
         onSave={(data) => handleSaveData(modalType, data)}
+        currentDate={currentDate}
       />
       
       {/* Delete Confirmation Modal */}
