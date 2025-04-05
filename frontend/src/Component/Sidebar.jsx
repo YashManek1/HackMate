@@ -1,7 +1,7 @@
 // src/Sidebar.jsx
 import React, { useState } from "react";
 import "../Styles/Sidebar.css";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import {
   FiBarChart,
   FiChevronDown,
@@ -13,6 +13,7 @@ import {
   FiTag,
   FiUsers,
 } from "react-icons/fi";
+import { FaUser } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 export const Sidebar = () => {
@@ -26,13 +27,16 @@ export const Sidebar = () => {
 const SidebarLeft = () => {
   const [open, setOpen] = useState(true);
   const location = useLocation();
-  const currentPath = location.pathname;
+  const currentPath = location.pathname; 
 
   // Highlight "Resources" for /dashboard/resources and /dashboard/resources/*
   const [selected, setSelected] = useState(
-    currentPath.includes("/dashboard/resources") ? "Resources" :
-    currentPath === "/dashboard" ? "Dashboard" :
-    currentPath.split("/").pop().charAt(0).toUpperCase() + currentPath.split("/").pop().slice(1) || "Dashboard"
+    currentPath.includes("/dashboard/resources")
+      ? "Resources"
+      : currentPath === "/dashboard"
+      ? "Dashboard"
+      : currentPath.split("/").pop().charAt(0).toUpperCase() +
+          currentPath.split("/").pop().slice(1) || "Dashboard"
   );
 
   return (
@@ -112,19 +116,19 @@ const SidebarLeft = () => {
 
 const Option = ({ Icon, title, path, selected, setSelected, open, notifs }) => {
   const navigate = useNavigate();
-  
+
   const handleClick = () => {
     setSelected(title);
     navigate(path);
   };
-  
+
   return (
     <motion.button
       layout
       onClick={handleClick}
       className={`relative flex h-10 w-full items-center rounded-md transition-colors font-medium ${
-        selected === title 
-          ? "bg-[#f6ebff] text-[#340062]" 
+        selected === title
+          ? "bg-[#f6ebff] text-[#340062]"
           : "text-[#11014c] hover:bg-[#f6ebff] hover:bg-opacity-50"
       }`}
       style={{ fontFamily: "var(--font-dmsans)" }}
@@ -166,21 +170,40 @@ const Option = ({ Icon, title, path, selected, setSelected, open, notifs }) => {
 };
 
 const TitleSection = ({ open }) => {
+  const profileImage = null;
+  const userName = null;
+  const userEmail = null;
   return (
     <div className="mb-3 border-b border-[#b6cbff] pb-3">
-      <div className="flex cursor-pointer items-center justify-between rounded-md transition-colors hover:bg-[#f6ebff] hover:bg-opacity-50">
-        <div className="flex items-center gap-2">
-          <Logo />
+      <div className="flex items-center justify-between rounded-md transition-colors">
+        <div className="flex items-center gap-3">
+          {profileImage ? (
+            <img
+              src={profileImage}
+              alt="Profile"
+              className="h-10 w-10 rounded-full"
+            />
+          ) : (
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f6ebff]">
+              <FaUser className="text-[#340062]" />
+            </div>
+          )}
           {open && (
             <motion.div
               layout
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.125 }}
-              style={{ fontFamily: "var(--font-outfit)" }}
+              style={{ fontFamily: "var(--font-dmsans)" }}
             >
-              <span className="block text-xs font-semibold text-[#340062]">TomIsLoading</span>
-              <span className="block text-xs text-[#11014c]">Pro Plan</span>
+              <Link className="block text-sm font-semibold text-[#340062]"
+                to="/dashboard/profile"
+              >
+                {userName? userName:"Tanish Shah"}
+              </Link>
+              <span className="block text-xs text-[#11014c]">
+              {userEmail? userEmail:"shahtanish207@gmail.com"}
+              </span>
             </motion.div>
           )}
         </div>
