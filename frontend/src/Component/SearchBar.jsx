@@ -1,6 +1,7 @@
 import React from 'react';
-import "../Component/SearchBar.css"
-const SearchBar = () => {
+import "../Component/SearchBar.css";
+
+const SearchBar = ({ searchTerm, setSearchTerm }) => {
   return (
     <div className="input-wrapper">
       <button className="icon"> 
@@ -32,6 +33,8 @@ const SearchBar = () => {
         className="input" 
         name="text" 
         type="text"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
       />
     </div>
   );

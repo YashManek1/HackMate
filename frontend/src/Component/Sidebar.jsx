@@ -17,7 +17,7 @@ import { motion } from "framer-motion";
 
 export const Sidebar = () => {
   return (
-    <div className="flex bg-[#f6ebff]">
+    <div className="flex bg-[#f6ebff] h-full">
       <SidebarLeft />
     </div>
   );
@@ -38,15 +38,17 @@ const SidebarLeft = () => {
   return (
     <motion.nav
       layout
-      className="sticky top-0 h-screen shrink-0 border-r border-[#b6cbff] bg-white p-2"
+      className="fixed left-0 top-0 h-screen border-r border-[#b6cbff] bg-white p-2 overflow-y-auto flex flex-col"
       style={{
         width: open ? "225px" : "fit-content",
         fontFamily: "var(--font-poppins)",
+        height: "100vh", // Ensure full height
+        zIndex: 40, // Make sure sidebar stays above content
       }}
     >
       <TitleSection open={open} />
 
-      <div className="space-y-1">
+      <div className="space-y-1 flex-grow">
         <Option
           Icon={FiHome}
           title="Dashboard"
@@ -222,7 +224,7 @@ const ToggleClose = ({ open, setOpen }) => {
     <motion.button
       layout
       onClick={() => setOpen((pv) => !pv)}
-      className="absolute bottom-0 left-0 right-0 border-t border-[#b6cbff] transition-colors hover:bg-[#f6ebff] hover:bg-opacity-50"
+      className="w-full border-t border-[#b6cbff] transition-colors hover:bg-[#f6ebff] hover:bg-opacity-50 mt-auto"
       style={{ fontFamily: "var(--font-dmsans)" }}
     >
       <div className="flex items-center p-2">

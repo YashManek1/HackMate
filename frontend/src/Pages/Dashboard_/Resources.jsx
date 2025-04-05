@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import DashboardLayout from "../../Component/DashboardLayout.jsx";
-import {resources} from "../../Data/ResourceData.js";
+import { resources } from "../../Data/ResourceData.js";
 import "../../Styles/Resources.css";
 import SearchBar from "../../Component/SearchBar.jsx";
 
@@ -15,17 +15,17 @@ const Resources = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative ml-[225px]"> {/* Added margin-left to account for sidebar */}
         {/* SearchBar positioned in the top right corner */}
         <div className="absolute top-2 right-2 z-10">
-          <SearchBar/>
+          <SearchBar />
         </div>
         
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="pt-2" // Added padding to create space for the search icon
+          className="pt-8 pb-12" // Added more padding for better spacing
         >
           <h1 className="text-4xl font-bold text-[#340062] mb-8 font-poppins">
             Resources Dashboard
