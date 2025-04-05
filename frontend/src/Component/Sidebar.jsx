@@ -74,8 +74,8 @@ const SidebarLeft = () => {
         />
         <Option
           Icon={FiMonitor}
-          title="View Site"
-          path="/dashboard/view"
+          title="Hackathons"
+          path="/dashboard/hackathons"
           selected={selected}
           setSelected={setSelected}
           open={open}
