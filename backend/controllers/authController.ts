@@ -4,6 +4,7 @@ import { authService } from "../services/authService";
 import passport from "passport";
 import { User, PrismaClient } from "@prisma/client"; // Import User type from Prisma
 import { encrypt } from "../utils/crypto";
+import crypto from "crypto";
 
 const prisma = new PrismaClient();
 
@@ -159,6 +160,46 @@ class AuthController {
       next(error);
     }
   }
+
+  sendEmailVerification = async (req: Request, res: Response) => {
+    const userId = req.user?.id; // depends on your auth middleware
+
+    try {
+      await authService.sendVerificationEmail(userId);
+      res.status(200).json({ message: "Verification email sent" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Could not send verification email" });
+    }
+  };
+
+  verifyEmail = async (req: Request, res: Response) => {
+    const token = req.params.token;
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await prisma.user.findFirst({
+      where: {
+        verificationToken: hashedToken,
+        verificationTokenExpiry: { gte: new Date() },
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: "Token is invalid or has expired" });
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        isEmailVerified: true,
+        verificationToken: null,
+        verificationTokenExpiry: null,
+      },
+    });
+
+    // redirect to frontend dashboard
+    res.redirect("https://hackmate-frontend.com/dashboard"); // replace later
+  };
 }
 
 export const authController = new AuthController();

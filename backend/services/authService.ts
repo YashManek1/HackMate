@@ -4,6 +4,9 @@ import bcrypt from "bcrypt";
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import { authConfig } from "../config/auth";
 import moment from "moment-timezone";
+import { transporter } from "../utils/nodemailer";
+import { addMinutes } from "date-fns";
+import crypto from "crypto";
 
 const prisma = new PrismaClient();
 
@@ -105,6 +108,36 @@ export class AuthService {
 
     return this.generateTokens(user);
   }
+
+  sendVerificationEmail = async (userId: string) => {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user || user.isEmailVerified)
+      throw new Error("User not found or already verified");
+
+    const token = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        verificationToken: hashedToken,
+        verificationTokenExpiry: addMinutes(new Date(), 15),
+      },
+    });
+
+    const verifyUrl = `https://hackmate-frontend.com/auth/verify-email/${token}`; // Dummy link
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: "Verify your HackMate Email",
+      html: `<p>Click the link to verify your email:</p>
+           <a href="${verifyUrl}">${verifyUrl}</a>
+           <p>This link expires in 15 minutes.</p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+  };
 }
 
 export const authService = new AuthService();

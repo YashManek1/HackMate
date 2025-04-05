@@ -7,13 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  PARTICIPANT
-  MENTOR
-  JUDGE
-  ADMIN
-}
-
 enum Status {
   PENDING
   IN_PROGRESS
@@ -35,13 +28,11 @@ model User {
   portfolioUrl           String?
   bio                    String?
   avatarUrl              String?
-  role                   Role                     @default(PARTICIPANT)
   skills                 Skill[]                  @relation("UserSkills")
   experience             Json?
   interests              String[]
   timeZone               String?
   availability           Json?
-  projects               ProjectMember[]
   teamMemberships        TeamMember[]
   progressUpdates        ProgressUpdate[]         @relation("UserProgressUpdates")
   aiRecommendations      AIRecommendation[]       @relation("UserRecommendations")
@@ -50,11 +41,7 @@ model User {
   updatedAt              DateTime                 @updatedAt
   githubStats            Json?
   comments               Comment[]
-  hackathonId            String?
-  hackathon              Hackathon?               @relation(fields: [hackathonId], references: [id])
-  judging                Hackathon[]              @relation("HackathonJudges")
-  mentoring              Hackathon[]              @relation("HackathonMentors")
-  Team                   Team[]
+  Team                   Team[] // Teams this user leads or is part of
   RecommendationFeedback RecommendationFeedback[]
   GitHubContribution     GitHubContribution[]
   NotificationPreference NotificationPreference?
@@ -63,20 +50,23 @@ model User {
   mentorshipsGiven       Mentorship[]             @relation("MentorshipsGiven")
   mentorshipsReceived    Mentorship[]             @relation("MentorshipsReceived")
   EventLog               EventLog[]
+  // CHANGED: Added hackathons relation to track user's hackathon participation
+  hackathons             Hackathon[]              @relation("UserHackathons") // Through team membership
 
-  gitHubAccessToken  String? @db.Text // For GitHub API access
-  gitHubRefreshToken String? @db.Text // For GitHub API access
-
-  googleAccessToken  String? @db.Text // For Google API access
-  googleRefreshToken String? @db.Text // For Google API access
-
-  password           String? // For normal signup/login
-  googleId           String?   @unique // For Google OAuth
-  refreshToken       String? // For session management
-  isEmailVerified    Boolean   @default(false) // Email verification
-  status             String    @default("active") // Account status
-  lastLogin          DateTime? // Track user activity
-  aiInteractionPrefs Json? // Customize AI interaction
+  gitHubAccessToken       String?         @db.Text
+  gitHubRefreshToken      String?         @db.Text
+  googleAccessToken       String?         @db.Text
+  googleRefreshToken      String?         @db.Text
+  verificationToken       String?
+  verificationTokenExpiry DateTime?
+  password                String?
+  googleId                String?         @unique
+  refreshToken            String?
+  isEmailVerified         Boolean         @default(false)
+  status                  String          @default("active")
+  lastLogin               DateTime?
+  aiInteractionPrefs      Json?
+  ProjectMember           ProjectMember[]
 }
 
 model Skill {
@@ -91,22 +81,23 @@ model Skill {
 model Team {
   id                String       @id @default(uuid())
   name              String
-  hackathonId       String
   description       String?
   lookingForMembers Boolean      @default(false)
   skillsNeeded      Skill[]      @relation("TeamSkillsNeeded")
   members           TeamMember[]
-  projects          Project[]
+  hackathon         Hackathon? // Each team creates one hackathon
+  project           Project? // Each team has one project
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
   leaderId          String
   leader            User         @relation(fields: [leaderId], references: [id])
   tasks             Task[]       @relation("TeamTasks")
-  hackathon         Hackathon    @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
 }
 
 model Hackathon {
-  id           String    @id @default(uuid())
+  id           String              @id @default(uuid())
+  teamId       String              @unique
+  team         Team                @relation(fields: [teamId], references: [id], onDelete: Cascade)
   name         String
   description  String?
   startDate    DateTime
@@ -115,25 +106,32 @@ model Hackathon {
   rules        String?
   prizeDetails Json?
   themes       String[]
-  teams        Team[]
-  projects     Project[]
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
   aiInsights   Json?
-  judges       User[]    @relation("HackathonJudges")
-  mentors      User[]    @relation("HackathonMentors")
-  users        User[]
+  users        User[]              @relation("UserHackathons") // Users participating through teams
+  // ADDED: Relation to timeline events
+  timeline     HackathonTimeline[] @relation("HackathonTimeline")
+}
+
+model HackathonTimeline {
+  id          String    @id @default(uuid())
+  hackathonId String
+  hackathon   Hackathon @relation("HackathonTimeline", fields: [hackathonId], references: [id], onDelete: Cascade)
+  eventName   String // e.g., "Hackathon Start", "Mentoring Round 1", "Hackathon Ends"
+  eventTime   DateTime // Specific date and time of the event
+  description String? // Optional details about the event
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Project {
   id                       String               @id @default(uuid())
   name                     String
   description              String?
-  teamId                   String
+  teamId                   String               @unique
   team                     Team                 @relation(fields: [teamId], references: [id], onDelete: Cascade)
   tasks                    Task[]               @relation("ProjectTasks")
-  hackathonId              String
-  hackathon                Hackathon            @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
   createdAt                DateTime             @default(now())
   updatedAt                DateTime             @updatedAt
   totalCommits             Int                  @default(0)
@@ -217,9 +215,8 @@ model Comment {
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  task Task? @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("comments")
 }
@@ -230,9 +227,8 @@ model ProgressUpdate {
   projectId String
   content   String
   createdAt DateTime @default(now())
-
-  user    User    @relation("UserProgressUpdates", fields: [userId], references: [id], onDelete: Cascade)
-  project Project @relation("ProjectProgressUpdates", fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation("UserProgressUpdates", fields: [userId], references: [id], onDelete: Cascade)
+  project   Project  @relation("ProjectProgressUpdates", fields: [projectId], references: [id], onDelete: Cascade)
 
   @@map("progress_updates")
 }
@@ -252,9 +248,8 @@ model ProjectMember {
   projectId String
   role      ProjectRole @default(CONTRIBUTOR)
   joinedAt  DateTime    @default(now())
-
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Restrict)
 
   @@id([userId, projectId])
   @@map("project_members")
@@ -276,9 +271,8 @@ model TeamMember {
   teamId   String
   role     TeamRole @default(MEMBER)
   joinedAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
-  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Restrict)
 
   @@id([userId, teamId])
   @@map("team_members")
@@ -300,10 +294,9 @@ model AIRecommendation {
   taskId          String?
   confidenceScore Float?
   feedback        RecommendationFeedback[]
-
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  user    User?   @relation("UserRecommendations", fields: [userId], references: [id], onDelete: SetNull)
-  task    Task?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  project         Project                  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user            User?                    @relation("UserRecommendations", fields: [userId], references: [id], onDelete: SetNull)
+  task            Task?                    @relation(fields: [taskId], references: [id], onDelete: SetNull)
 
   @@map("ai_recommendations")
 }
@@ -322,15 +315,14 @@ enum RecommendationType {
 }
 
 model RecommendationFeedback {
-  id               String   @id @default(uuid())
+  id               String           @id @default(uuid())
   recommendationId String
   userId           String
-  timestamp        DateTime @default(now())
+  timestamp        DateTime         @default(now())
   isHelpful        Boolean?
   comment          String?
-
-  recommendation AIRecommendation @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
-  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recommendation   AIRecommendation @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("recommendation_feedback")
 }
@@ -343,9 +335,8 @@ model GitHubContribution {
   action    String?
   url       String
   createdAt DateTime @default(now())
-
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@map("github_contributions")
 }
@@ -358,8 +349,7 @@ model NotificationPreference {
   telegram Boolean @default(false)
   email    Boolean @default(true)
   settings Json?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notification_preferences")
 }
@@ -373,10 +363,9 @@ model Notification {
   isRead    Boolean  @default(false)
   projectId String?
   taskId    String?
-
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  task    Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
 
   @@map("notifications")
 }
@@ -386,8 +375,7 @@ model SubmissionFeedback {
   projectId String   @unique
   feedback  Json?
   createdAt DateTime @default(now())
-
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@map("submission_feedback")
 }
@@ -399,11 +387,10 @@ model Mentorship {
   startDate DateTime  @default(now())
   endDate   DateTime?
   notes     String?
-
-  mentor User    @relation("MentorshipsGiven", fields: [mentorId], references: [id], onDelete: Cascade)
-  mentee User    @relation("MentorshipsReceived", fields: [menteeId], references: [id], onDelete: Cascade)
-  User   User?   @relation(fields: [userId], references: [id])
-  userId String?
+  mentor    User      @relation("MentorshipsGiven", fields: [mentorId], references: [id], onDelete: Cascade)
+  mentee    User      @relation("MentorshipsReceived", fields: [menteeId], references: [id], onDelete: Cascade)
+  User      User?     @relation(fields: [userId], references: [id])
+  userId    String?
 
   @@map("mentorships")
 }
@@ -415,9 +402,8 @@ model TimelineSuggestion {
   suggestedDueDate DateTime?
   reasoning        String?
   createdAt        DateTime  @default(now())
-
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  task    Task?   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  project          Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  task             Task?     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@map("timeline_suggestions")
 }
@@ -430,11 +416,10 @@ model TaskConflict {
   suggestedResolution Json?
   resolved            Boolean   @default(false)
   resolvedAt          DateTime?
-
-  task1  Task    @relation("ConflictingTask1", fields: [task1Id], references: [id], onDelete: Cascade)
-  task2  Task    @relation("ConflictingTask2", fields: [task2Id], references: [id], onDelete: Cascade)
-  Task   Task?   @relation(fields: [taskId], references: [id])
-  taskId String?
+  task1               Task      @relation("ConflictingTask1", fields: [task1Id], references: [id], onDelete: Cascade)
+  task2               Task      @relation("ConflictingTask2", fields: [task2Id], references: [id], onDelete: Cascade)
+  Task                Task?     @relation(fields: [taskId], references: [id])
+  taskId              String?
 
   @@map("task_conflicts")
 }
@@ -445,8 +430,7 @@ model ProjectAssessment {
   readinessScore Float?
   feedback       Json?
   assessedAt     DateTime @default(now())
-
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@map("project_assessments")
 }
@@ -459,10 +443,9 @@ model EventLog {
   projectId String?
   taskId    String?
   details   Json?
-
-  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  task    Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
 
   @@map("event_logs")
 }

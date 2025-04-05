@@ -7,6 +7,7 @@ import session from "express-session";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
+import hackathonRoutes from "./routes/hackathonRoutes";
 import githubRoutes from "./routes/githubRoutes";
 
 import { errorMiddleware } from "./middlewares/errorMiddleware";
@@ -43,6 +44,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/github", githubRoutes);
+app.use("/hackathon", hackathonRoutes);
 
 // Error handling
 app.use(errorMiddleware);

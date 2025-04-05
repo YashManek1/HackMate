@@ -1,6 +1,7 @@
 // src/routes/authRoutes.ts
 import { Router } from "express";
 import { authController } from "../controllers/authController";
+import { authMiddleware } from "../middlewares/authMiddleware";
 
 const router = Router();
 
@@ -21,5 +22,13 @@ router.post("/logout", authController.logout);
 
 // Refresh Token
 router.post("/refresh-token", authController.refreshToken);
+
+// Email Verification
+router.post(
+  "/verify-email",
+  authMiddleware,
+  authController.sendEmailVerification
+);
+router.get("/verify-email/:token", authController.verifyEmail);
 
 export default router;
