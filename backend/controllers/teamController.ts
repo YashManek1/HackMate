@@ -1,53 +1,83 @@
-import { Request, Response } from 'express';
-import * as teamService from '../services/teamService';
+import { Request, Response } from "express";
+import {
+  createTeam,
+  updateTeam,
+  getTeam,
+  deleteTeam,
+  joinTeam,
+} from "../services/teamService";
 
-export const createTeam = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { name, description, leaderId, lookingForMembers } = req.body;
-    const team = await teamService.createTeam({ name, description, leaderId, lookingForMembers });
-    res.status(201).json({ success: true, data: team });
-  } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+export const teamController = {
+  // Create a new team
+  async createTeam(req: Request, res: Response) {
+    const { name, description, lookingForMembers } = req.body;
+    const userId = req.user.id; // Get userId from authMiddleware
 
-export const updateTeam = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { teamId } = req.params;
+    try {
+      const team = await createTeam({
+        name,
+        description,
+        leaderId: userId, // Use userId as the leaderId
+        lookingForMembers,
+      });
+      res.status(201).json(team);
+    } catch (error: any) {
+      console.error("❌ Error creating team:", error.message);
+      res.status(500).json({ error: "Failed to create team." });
+    }
+  },
+
+  // Update a team
+  async updateTeam(req: Request, res: Response) {
+    const { id: teamId } = req.params; // Get teamId from route params
     const updates = req.body;
-    const updatedTeam = await teamService.updateTeam(teamId, updates);
-    res.status(200).json({ success: true, data: updatedTeam });
-  } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
 
-export const getTeam = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { teamId } = req.params;
-    const team = await teamService.getTeam(teamId);
-    res.status(200).json({ success: true, data: team });
-  } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+    try {
+      const updatedTeam = await updateTeam(teamId, updates);
+      res.json(updatedTeam);
+    } catch (error: any) {
+      console.error("❌ Error updating team:", error.message);
+      res.status(500).json({ error: "Failed to update team." });
+    }
+  },
 
-export const deleteTeam = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { teamId } = req.params;
-    await teamService.deleteTeam(teamId);
-    res.status(200).json({ success: true, message: 'Team deleted successfully' });
-  } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+  // Get a team by ID
+  async getTeam(req: Request, res: Response) {
+    const { id: teamId } = req.params; // Get teamId from route params
 
-export const joinTeam = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { teamCode, userId } = req.body;
-    const team = await teamService.joinTeam(teamCode, userId);
-    res.status(200).json({ success: true, data: team });
-  } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+    try {
+      const team = await getTeam(teamId);
+      res.json(team);
+    } catch (error: any) {
+      console.error("❌ Error fetching team:", error.message);
+      res.status(404).json({ error: "Team not found." });
+    }
+  },
+
+  // Delete a team
+  async deleteTeam(req: Request, res: Response) {
+    const { id: teamId } = req.params; // Get teamId from route params
+
+    try {
+      await deleteTeam(teamId);
+      res.status(204).send();
+    } catch (error: any) {
+      console.error("❌ Error deleting team:", error.message);
+      res.status(500).json({ error: "Failed to delete team." });
+    }
+  },
+
+  // Join a team
+  async joinTeam(req: Request, res: Response) {
+    const { teamCode } = req.body;
+    const userId = req.user.id; // Get userId from authMiddleware
+
+    try {
+      const team = await joinTeam(teamCode, userId);
+      res.json(team);
+    } catch (error: any) {
+      console.error("❌ Error joining team:", error.message);
+      res.status(400).json({ error: error.message || "Failed to join team." });
+    }
+  },
 };

@@ -29,7 +29,7 @@ export const hackathonController = {
       const hackathon = await hackathonService.getHackathonById(id);
       res.json(hackathon);
     } catch (error: any) {
-      console.error("❌ Error in getHackathonDetails:", error.message);
+      console.error("Error in getHackathonDetails:", error.message);
       res.status(404).json({ error: error.message || "Hackathon not found" });
     }
   },
@@ -41,7 +41,7 @@ export const hackathonController = {
       const hackathons = await hackathonService.getHackathonsByUserId(userId);
       res.json(hackathons);
     } catch (error: any) {
-      console.error("❌ Error in getUserHackathons:", error.message);
+      console.error("Error in getUserHackathons:", error.message);
       res
         .status(500)
         .json({ error: error.message || "Failed to fetch hackathons." });
@@ -54,7 +54,7 @@ export const hackathonController = {
       const hackathons = await hackathonService.getOngoingHackathons();
       res.json(hackathons);
     } catch (error: any) {
-      console.error("❌ Error fetching ongoing hackathons:", error.message);
+      console.error("Error fetching ongoing hackathons:", error.message);
       res.status(500).json({ error: "Failed to fetch ongoing hackathons." });
     }
   },
@@ -65,7 +65,7 @@ export const hackathonController = {
       const hackathons = await hackathonService.getPastHackathons();
       res.json(hackathons);
     } catch (error: any) {
-      console.error("❌ Error fetching past hackathons:", error.message);
+      console.error("Error fetching past hackathons:", error.message);
       res.status(500).json({ error: "Failed to fetch past hackathons." });
     }
   },
@@ -76,7 +76,7 @@ export const hackathonController = {
       const hackathons = await hackathonService.getUpcomingHackathons();
       res.json(hackathons);
     } catch (error: any) {
-      console.error("❌ Error fetching upcoming hackathons:", error.message);
+      console.error("Error fetching upcoming hackathons:", error.message);
       res.status(500).json({ error: "Failed to fetch upcoming hackathons." });
     }
   },

@@ -97,45 +97,32 @@ class HackathonService {
 
   // Fetch ongoing hackathons
   async getOngoingHackathons() {
-    const now = new Date();
-    return await prisma.hackathon.findMany({
-      where: {
-        startDate: { lte: now }, // Start date is less than or equal to now
-        endDate: { gte: now }, // End date is greater than or equal to now
-      },
-      include: {
-        timeline: true,
-        team: true,
-      },
-    });
+    const now = new Date().toISOString(); // Convert current date to ISO string
+
+    return await prisma.$queryRaw`
+      SELECT * FROM "Hackathon"
+      WHERE "startDate" <= ${now} AND "endDate" >= ${now}
+    `;
   }
 
   // Fetch past hackathons
   async getPastHackathons() {
-    const now = new Date();
-    return await prisma.hackathon.findMany({
-      where: {
-        endDate: { lt: now }, // End date is less than now
-      },
-      include: {
-        timeline: true,
-        team: true,
-      },
-    });
+    const now = new Date().toISOString(); // Convert current date to ISO string
+
+    return await prisma.$queryRaw`
+      SELECT * FROM "Hackathon"
+      WHERE "endDate" < ${now}
+    `;
   }
 
   // Fetch upcoming hackathons
   async getUpcomingHackathons() {
-    const now = new Date();
-    return await prisma.hackathon.findMany({
-      where: {
-        startDate: { gt: now }, // Start date is greater than now
-      },
-      include: {
-        timeline: true,
-        team: true,
-      },
-    });
+    const now = new Date().toISOString(); // Convert current date to ISO string
+
+    return await prisma.$queryRaw`
+      SELECT * FROM "Hackathon"
+      WHERE "startDate" > ${now}
+    `;
   }
 }
 
