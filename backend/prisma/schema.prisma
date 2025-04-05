@@ -7,75 +7,61 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Status {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-}
-
-enum Difficulty {
-  EASY
-  MEDIUM
-  HARD
-}
-
 model User {
-  id                     String                   @id @default(uuid())
-  email                  String                   @unique
-  name                   String
-  githubId               String?                  @unique
-  linkedinId             String?                  @unique
-  portfolioUrl           String?
-  bio                    String?
-  avatarUrl              String?
-  skills                 Skill[]                  @relation("UserSkills")
-  experience             Json?
-  interests              String[]
-  timeZone               String?
-  availability           Json?
-  teamMemberships        TeamMember[]
-  progressUpdates        ProgressUpdate[]         @relation("UserProgressUpdates")
-  aiRecommendations      AIRecommendation[]       @relation("UserRecommendations")
-  tasksAssigned          Task[]                   @relation("TaskAssignee")
-  createdAt              DateTime                 @default(now())
-  updatedAt              DateTime                 @updatedAt
-  githubStats            Json?
-  comments               Comment[]
-  Team                   Team[] // Teams this user leads or is part of
-  RecommendationFeedback RecommendationFeedback[]
-  GitHubContribution     GitHubContribution[]
-  NotificationPreference NotificationPreference?
-  Notification           Notification[]
-  Mentorship             Mentorship[]
-  mentorshipsGiven       Mentorship[]             @relation("MentorshipsGiven")
-  mentorshipsReceived    Mentorship[]             @relation("MentorshipsReceived")
-  EventLog               EventLog[]
-  // CHANGED: Added hackathons relation to track user's hackathon participation
-  hackathons             Hackathon[]              @relation("UserHackathons") // Through team membership
-
-  gitHubAccessToken       String?         @db.Text
-  gitHubRefreshToken      String?         @db.Text
-  googleAccessToken       String?         @db.Text
-  googleRefreshToken      String?         @db.Text
+  id                      String                   @id @default(uuid())
+  email                   String                   @unique
+  name                    String
+  aiInteractionPrefs      Json?
+  availability            Json?
+  avatarUrl               String?
+  bio                     String?
+  createdAt               DateTime                 @default(now())
+  experience              Json?
+  githubId                String?                  @unique
+  githubStats             Json?
+  googleId                String?                  @unique
+  interests               String[]
+  isEmailVerified         Boolean                  @default(false)
+  lastLogin               DateTime?
+  linkedinId              String?                  @unique
+  password                String?
+  portfolioUrl            String?
+  refreshToken            String?
+  status                  String                   @default("active")
+  timeZone                String?
+  updatedAt               DateTime                 @updatedAt
+  gitHubAccessToken       String?
+  gitHubRefreshToken      String?
+  googleAccessToken       String?
+  googleRefreshToken      String?
   verificationToken       String?
   verificationTokenExpiry DateTime?
-  password                String?
-  googleId                String?         @unique
-  refreshToken            String?
-  isEmailVerified         Boolean         @default(false)
-  status                  String          @default("active")
-  lastLogin               DateTime?
-  aiInteractionPrefs      Json?
+  tasksAssigned           Task[]                   @relation("TaskAssignee")
+  Team                    Team[]
+  aiRecommendations       AIRecommendation[]       @relation("UserRecommendations")
+  comments                Comment[]
+  EventLog                EventLog[]
+  GitHubContribution      GitHubContribution[]
+  mentorshipsReceived     Mentorship[]             @relation("MentorshipsReceived")
+  mentorshipsGiven        Mentorship[]             @relation("MentorshipsGiven")
+  Mentorship              Mentorship[]
+  NotificationPreference  NotificationPreference?
+  Notification            Notification[]
+  progressUpdates         ProgressUpdate[]         @relation("UserProgressUpdates")
   ProjectMember           ProjectMember[]
+  RecommendationFeedback  RecommendationFeedback[]
+  teamMemberships         TeamMember[]
+  hackathons              Hackathon[]              @relation("UserHackathons")
+  skills                  Skill[]                  @relation("UserSkills")
 }
 
 model Skill {
   id       String    @id @default(uuid())
   name     String    @unique
   category String?
-  users    User[]    @relation("UserSkills")
-  teams    Team[]    @relation("TeamSkillsNeeded")
   projects Project[] @relation("ProjectTechnologies")
+  teams    Team[]    @relation("TeamSkillsNeeded")
+  users    User[]    @relation("UserSkills")
 }
 
 model Team {
@@ -83,21 +69,19 @@ model Team {
   name              String
   description       String?
   lookingForMembers Boolean      @default(false)
-  skillsNeeded      Skill[]      @relation("TeamSkillsNeeded")
-  members           TeamMember[]
-  hackathon         Hackathon? // Each team creates one hackathon
-  project           Project? // Each team has one project
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
   leaderId          String
-  leader            User         @relation(fields: [leaderId], references: [id])
+  hackathon         Hackathon?
+  project           Project?
   tasks             Task[]       @relation("TeamTasks")
+  leader            User         @relation(fields: [leaderId], references: [id])
+  members           TeamMember[]
+  skillsNeeded      Skill[]      @relation("TeamSkillsNeeded")
 }
 
 model Hackathon {
   id           String              @id @default(uuid())
-  teamId       String?             @unique
-  team         Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
   name         String
   description  String?
   startDate    DateTime
@@ -105,24 +89,25 @@ model Hackathon {
   location     String?
   rules        String?
   prizeDetails Json?
-  domains      String[]
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
   aiInsights   Json?
-  users        User[]              @relation("UserHackathons") // Users participating through teams
-  // ADDED: Relation to timeline events
+  domains      String[]
+  teamId       String?             @unique
+  team         Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
   timeline     HackathonTimeline[] @relation("HackathonTimeline")
+  users        User[]              @relation("UserHackathons")
 }
 
 model HackathonTimeline {
   id          String    @id @default(uuid())
   hackathonId String
-  hackathon   Hackathon @relation("HackathonTimeline", fields: [hackathonId], references: [id], onDelete: Cascade)
-  eventName   String // e.g., "Hackathon Start", "Mentoring Round 1", "Hackathon Ends"
-  eventTime   DateTime // Specific date and time of the event
-  description String? // Optional details about the event
+  eventName   String
+  eventTime   DateTime
+  description String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  hackathon   Hackathon @relation("HackathonTimeline", fields: [hackathonId], references: [id], onDelete: Cascade)
 }
 
 model Project {
@@ -130,8 +115,6 @@ model Project {
   name                     String
   description              String?
   teamId                   String               @unique
-  team                     Team                 @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  tasks                    Task[]               @relation("ProjectTasks")
   createdAt                DateTime             @default(now())
   updatedAt                DateTime             @updatedAt
   totalCommits             Int                  @default(0)
@@ -146,25 +129,21 @@ model Project {
   technologyStack          String[]
   problemStatement         String?
   solutionOverview         String?
-  technologies             Skill[]              @relation("ProjectTechnologies")
   repositoryUrl            String?
   submissionUrl            String?
-  progressUpdates          ProgressUpdate[]     @relation("ProjectProgressUpdates")
-  members                  ProjectMember[]
-  report                   ProjectReport?
+  team                     Team                 @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  tasks                    Task[]               @relation("ProjectTasks")
   AIRecommendation         AIRecommendation[]
+  EventLog                 EventLog[]
   GitHubContribution       GitHubContribution[]
   Notification             Notification[]
+  progressUpdates          ProgressUpdate[]     @relation("ProjectProgressUpdates")
+  ProjectAssessment        ProjectAssessment?
+  members                  ProjectMember[]
+  report                   ProjectReport?
   SubmissionFeedback       SubmissionFeedback?
   TimelineSuggestion       TimelineSuggestion[]
-  ProjectAssessment        ProjectAssessment?
-  EventLog                 EventLog[]
-}
-
-enum TaskPriority {
-  LOW
-  MEDIUM
-  HIGH
+  technologies             Skill[]              @relation("ProjectTechnologies")
 }
 
 model Task {
@@ -181,31 +160,31 @@ model Task {
   dependencies       String[]
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
-  project            Project?             @relation("ProjectTasks", fields: [projectId], references: [id], onDelete: Cascade)
-  assignee           User?                @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
-  checkList          CheckListItem[]
-  comments           Comment[]
   teamId             String
-  team               Team                 @relation("TeamTasks", fields: [teamId], references: [id], onDelete: Cascade)
   difficulty         Difficulty           @default(MEDIUM)
   aiSuggestion       Boolean              @default(false)
+  checkList          CheckListItem[]
+  assignee           User?                @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  project            Project?             @relation("ProjectTasks", fields: [projectId], references: [id], onDelete: Cascade)
+  team               Team                 @relation("TeamTasks", fields: [teamId], references: [id], onDelete: Cascade)
   AIRecommendation   AIRecommendation[]
+  comments           Comment[]
+  EventLog           EventLog[]
   Notification       Notification[]
-  TimelineSuggestion TimelineSuggestion[]
   conflictingTask1   TaskConflict[]       @relation("ConflictingTask1")
   conflictingTask2   TaskConflict[]       @relation("ConflictingTask2")
   TaskConflict       TaskConflict[]
-  EventLog           EventLog[]
+  TimelineSuggestion TimelineSuggestion[]
 }
 
 model CheckListItem {
   id        String  @id @default(uuid())
   taskId    String
-  task      Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
   status    String  @default("in-progress")
   rank      Int
   text      String
   completed Boolean @default(false)
+  task      Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
 model Comment {
@@ -227,8 +206,8 @@ model ProgressUpdate {
   projectId String
   content   String
   createdAt DateTime @default(now())
-  user      User     @relation("UserProgressUpdates", fields: [userId], references: [id], onDelete: Cascade)
   project   Project  @relation("ProjectProgressUpdates", fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation("UserProgressUpdates", fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("progress_updates")
 }
@@ -248,22 +227,11 @@ model ProjectMember {
   projectId String
   role      ProjectRole @default(CONTRIBUTOR)
   joinedAt  DateTime    @default(now())
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
   project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
 
   @@id([userId, projectId])
   @@map("project_members")
-}
-
-enum ProjectRole {
-  BACKEND_DEVELOPER
-  FULLSTACK_DEVELOPER
-  FRONTEND_DEVELOPER
-  DESIGNER
-  RESEARCHER
-  CONTRIBUTOR
-  PROJECT_MANAGER
-  TESTER
 }
 
 model TeamMember {
@@ -271,17 +239,11 @@ model TeamMember {
   teamId   String
   role     TeamRole @default(MEMBER)
   joinedAt DateTime @default(now())
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
   team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
 
   @@id([userId, teamId])
   @@map("team_members")
-}
-
-enum TeamRole {
-  LEADER
-  MEMBER
-  MENTOR
 }
 
 model AIRecommendation {
@@ -293,25 +255,12 @@ model AIRecommendation {
   userId          String?
   taskId          String?
   confidenceScore Float?
-  feedback        RecommendationFeedback[]
   project         Project                  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  user            User?                    @relation("UserRecommendations", fields: [userId], references: [id], onDelete: SetNull)
-  task            Task?                    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  task            Task?                    @relation(fields: [taskId], references: [id])
+  user            User?                    @relation("UserRecommendations", fields: [userId], references: [id])
+  feedback        RecommendationFeedback[]
 
   @@map("ai_recommendations")
-}
-
-enum RecommendationType {
-  TECHNOLOGY_SUGGESTION
-  TASK_ALLOCATION_ADVICE
-  RESOURCE_RECOMMENDATION
-  BEST_PRACTICE_TIP
-  DEBUGGING_HELP
-  SUBMISSION_IMPROVEMENT_SUGGESTION
-  TIMELINE_ADJUSTMENT_PROPOSAL
-  TEAM_FORMATION_SUGGESTION
-  MENTORSHIP_SUGGESTION
-  CODE_REVIEW_SUGGESTION
 }
 
 model RecommendationFeedback {
@@ -335,8 +284,8 @@ model GitHubContribution {
   action    String?
   url       String
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("github_contributions")
 }
@@ -363,9 +312,9 @@ model Notification {
   isRead    Boolean  @default(false)
   projectId String?
   taskId    String?
+  project   Project? @relation(fields: [projectId], references: [id])
+  task      Task?    @relation(fields: [taskId], references: [id])
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  task      Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
 
   @@map("notifications")
 }
@@ -387,10 +336,10 @@ model Mentorship {
   startDate DateTime  @default(now())
   endDate   DateTime?
   notes     String?
-  mentor    User      @relation("MentorshipsGiven", fields: [mentorId], references: [id], onDelete: Cascade)
-  mentee    User      @relation("MentorshipsReceived", fields: [menteeId], references: [id], onDelete: Cascade)
-  User      User?     @relation(fields: [userId], references: [id])
   userId    String?
+  mentee    User      @relation("MentorshipsReceived", fields: [menteeId], references: [id], onDelete: Cascade)
+  mentor    User      @relation("MentorshipsGiven", fields: [mentorId], references: [id], onDelete: Cascade)
+  User      User?     @relation(fields: [userId], references: [id])
 
   @@map("mentorships")
 }
@@ -416,10 +365,10 @@ model TaskConflict {
   suggestedResolution Json?
   resolved            Boolean   @default(false)
   resolvedAt          DateTime?
+  taskId              String?
   task1               Task      @relation("ConflictingTask1", fields: [task1Id], references: [id], onDelete: Cascade)
   task2               Task      @relation("ConflictingTask2", fields: [task2Id], references: [id], onDelete: Cascade)
   Task                Task?     @relation(fields: [taskId], references: [id])
-  taskId              String?
 
   @@map("task_conflicts")
 }
@@ -443,9 +392,57 @@ model EventLog {
   projectId String?
   taskId    String?
   details   Json?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  task      Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  project   Project? @relation(fields: [projectId], references: [id])
+  task      Task?    @relation(fields: [taskId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
 
   @@map("event_logs")
+}
+
+enum Status {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ProjectRole {
+  BACKEND_DEVELOPER
+  FULLSTACK_DEVELOPER
+  FRONTEND_DEVELOPER
+  DESIGNER
+  RESEARCHER
+  CONTRIBUTOR
+  PROJECT_MANAGER
+  TESTER
+}
+
+enum TeamRole {
+  LEADER
+  MEMBER
+  MENTOR
+}
+
+enum RecommendationType {
+  TECHNOLOGY_SUGGESTION
+  TASK_ALLOCATION_ADVICE
+  RESOURCE_RECOMMENDATION
+  BEST_PRACTICE_TIP
+  DEBUGGING_HELP
+  SUBMISSION_IMPROVEMENT_SUGGESTION
+  TIMELINE_ADJUSTMENT_PROPOSAL
+  TEAM_FORMATION_SUGGESTION
+  MENTORSHIP_SUGGESTION
+  CODE_REVIEW_SUGGESTION
 }
