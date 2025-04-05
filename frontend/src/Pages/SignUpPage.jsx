@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
+import image1 from "../Assets/image1.jpg"; // Placeholder for the image
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
@@ -16,8 +16,8 @@ const SignUpPage = () => {
         {/* Background Image - In production, replace with the actual sand dunes image from Pinterest */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://in.pinterest.com/pin/626633735684590604/" 
-            alt="Purple desert landscape" 
+            src={image1} 
+            alt="" 
             className="w-full h-full object-cover"
           />
           {/* Dark overlay to enhance text visibility */}

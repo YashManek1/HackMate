@@ -15,7 +15,7 @@ const Resources = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative ml-[225px]"> {/* Added margin-left to account for sidebar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative"> {/* Added margin-left to account for sidebar */}
         {/* SearchBar positioned in the top right corner */}
         <div className="absolute top-2 right-2 z-10">
           <SearchBar />

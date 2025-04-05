@@ -38,7 +38,7 @@ const ResourcePage = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative ml-[225px]"> {/* Added margin-left to account for fixed sidebar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative"> {/* Added margin-left to account for fixed sidebar */}
         <div className="absolute top-4 left-4">
           <BackButton />
         </div>

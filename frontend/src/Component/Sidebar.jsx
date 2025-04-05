@@ -18,7 +18,7 @@ import { motion } from "framer-motion";
 
 export const Sidebar = () => {
   return (
-    <div className="flex bg-[#f6ebff] h-full">
+    <div className="flex bg-[#f6ebff]">
       <SidebarLeft />
     </div>
   );
@@ -27,32 +27,27 @@ export const Sidebar = () => {
 const SidebarLeft = () => {
   const [open, setOpen] = useState(true);
   const location = useLocation();
-  const currentPath = location.pathname; 
+  const currentPath = location.pathname;
 
   // Highlight "Resources" for /dashboard/resources and /dashboard/resources/*
   const [selected, setSelected] = useState(
-    currentPath.includes("/dashboard/resources")
-      ? "Resources"
-      : currentPath === "/dashboard"
-      ? "Dashboard"
-      : currentPath.split("/").pop().charAt(0).toUpperCase() +
-          currentPath.split("/").pop().slice(1) || "Dashboard"
+    currentPath.includes("/dashboard/resources") ? "Resources" :
+    currentPath === "/dashboard" ? "Dashboard" :
+    currentPath.split("/").pop().charAt(0).toUpperCase() + currentPath.split("/").pop().slice(1) || "Dashboard"
   );
 
   return (
     <motion.nav
       layout
-      className="fixed left-0 top-0 h-screen border-r border-[#b6cbff] bg-white p-2 overflow-y-auto flex flex-col"
+      className="sticky top-0 h-screen shrink-0 border-r border-[#b6cbff] bg-white p-2"
       style={{
         width: open ? "225px" : "fit-content",
         fontFamily: "var(--font-poppins)",
-        height: "100vh", // Ensure full height
-        zIndex: 40, // Make sure sidebar stays above content
       }}
     >
       <TitleSection open={open} />
 
-      <div className="space-y-1 flex-grow">
+      <div className="space-y-1">
         <Option
           Icon={FiHome}
           title="Dashboard"
@@ -118,19 +113,19 @@ const SidebarLeft = () => {
 
 const Option = ({ Icon, title, path, selected, setSelected, open, notifs }) => {
   const navigate = useNavigate();
-
+  
   const handleClick = () => {
     setSelected(title);
     navigate(path);
   };
-
+  
   return (
     <motion.button
       layout
       onClick={handleClick}
       className={`relative flex h-10 w-full items-center rounded-md transition-colors font-medium ${
-        selected === title
-          ? "bg-[#f6ebff] text-[#340062]"
+        selected === title 
+          ? "bg-[#f6ebff] text-[#340062]" 
           : "text-[#11014c] hover:bg-[#f6ebff] hover:bg-opacity-50"
       }`}
       style={{ fontFamily: "var(--font-dmsans)" }}
@@ -247,7 +242,7 @@ const ToggleClose = ({ open, setOpen }) => {
     <motion.button
       layout
       onClick={() => setOpen((pv) => !pv)}
-      className="w-full border-t border-[#b6cbff] transition-colors hover:bg-[#f6ebff] hover:bg-opacity-50 mt-auto"
+      className="absolute bottom-0 left-0 right-0 border-t border-[#b6cbff] transition-colors hover:bg-[#f6ebff] hover:bg-opacity-50"
       style={{ fontFamily: "var(--font-dmsans)" }}
     >
       <div className="flex items-center p-2">
