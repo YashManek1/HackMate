@@ -1,8 +1,17 @@
-import React, { useState } from 'react';
-import { FiEdit2, FiCalendar, FiPlus, FiExternalLink, FiTrash2 } from 'react-icons/fi';
+import React, { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FiEdit2, FiCalendar, FiPlus, FiExternalLink, FiTrash2, FiUser, FiBriefcase, FiAward, FiCheck, FiCode, FiLayers, FiClock, FiEye } from 'react-icons/fi';
+import ResumeUpload from './TabComponents/ResumeUpload';
 
-const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) => {
+const ProfileSection = ({ 
+  onOpenModal, 
+  onEditItem, 
+  onDeleteItem, 
+  profileData, 
+  username
+}) => {
   const [activeTab, setActiveTab] = useState('Education');
+  const navigate = useNavigate();
   
   const tabs = [
     'Education', 
@@ -10,11 +19,24 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
     'Position of Responsibility', 
     'Work Experience', 
     'Achievements', 
-    'Certifications'
+    'Certifications',
+    'Hackathon Preferences'
   ];
+
+  // Get first letter of username for avatar
+  const userInitial = username ? username.charAt(0).toUpperCase() : 'U';
+  
+  // Navigation handlers
+  const handleViewProfile = () => {
+    navigate('/dashboard/profile/view');
+  };
 
   // Function to render content based on active tab and data
   const renderTabContent = () => {
+    if (activeTab === 'Hackathon Preferences') {
+      return renderHackathonPreferencesTab();
+    }
+    
     const tabData = profileData[activeTab];
     
     if (!tabData || tabData.length === 0) {
@@ -28,7 +50,7 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
           <p className="text-[#11014c] opacity-70 mb-4">{getTabDescription(activeTab)}</p>
           <button 
             onClick={() => onOpenModal(activeTab)}
-            className="inline-flex items-center px-4 py-2 border border-[#340062] text-[#340062] rounded"
+            className="inline-flex items-center px-4 py-2 border border-[#340062] text-[#340062] rounded hover:bg-[#f6ebff] transition-colors"
           >
             <FiPlus className="mr-2" /> Add new
           </button>
@@ -42,7 +64,7 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
             <h3 className="font-bold text-lg text-[#340062]">{activeTab}</h3>
             <button 
               onClick={() => onOpenModal(activeTab)}
-              className="inline-flex items-center px-3 py-1 border border-[#340062] text-[#340062] rounded text-sm"
+              className="inline-flex items-center px-3 py-1 border border-[#340062] text-[#340062] rounded text-sm hover:bg-[#f6ebff] transition-colors"
             >
               <FiPlus className="mr-1" /> Add More
             </button>
@@ -55,6 +77,190 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
     }
   };
   
+  // Hackathon Preferences Tab Rendering
+  const renderHackathonPreferencesTab = () => {
+    const hackathonPreferences = profileData['Hackathon Preferences'] || {};
+    const hasPreferences = Object.keys(hackathonPreferences).length > 0;
+    
+    return (
+      <div className="py-4">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="font-bold text-lg text-[#340062]">Hackathon Preferences</h3>
+          <button 
+            onClick={() => onOpenModal('Hackathon Preferences')}
+            className="inline-flex items-center px-3 py-1 border border-[#340062] text-[#340062] rounded text-sm hover:bg-[#f6ebff] transition-colors"
+          >
+            {hasPreferences ? 'Edit Preferences' : 'Add Preferences'}
+          </button>
+        </div>
+        
+        {!hasPreferences ? (
+          <div className="text-center py-8">
+            <div className="bg-[#f6ebff] inline-block p-4 rounded-full mb-4">
+              <FiCode size={24} color="#340062" />
+            </div>
+            <h3 className="font-bold text-lg mb-1 text-[#340062]">Add Hackathon Preferences</h3>
+            <p className="text-[#11014c] opacity-70 mb-4">Help us match you with the perfect hackathon teams and projects</p>
+            <button 
+              onClick={() => onOpenModal('Hackathon Preferences')}
+              className="inline-flex items-center px-4 py-2 border border-[#340062] text-[#340062] rounded hover:bg-[#f6ebff] transition-colors"
+            >
+              <FiPlus className="mr-2" /> Add preferences
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Role Preferences */}
+            <div className="border border-[#b6cbff] rounded-lg p-6">
+              <div className="flex items-center mb-4">
+                <div className="bg-[#f6ebff] p-3 rounded-full mr-3">
+                  <FiCode size={20} color="#340062" />
+                </div>
+                <h4 className="font-bold text-[#340062]">Role Preferences</h4>
+              </div>
+              
+              <div className="space-y-2">
+                {hackathonPreferences.rolePreferences && hackathonPreferences.rolePreferences.length > 0 ? (
+                  hackathonPreferences.rolePreferences.map((role, idx) => (
+                    <div key={idx} className="flex items-center bg-[#f6ebff] px-3 py-2 rounded-md">
+                      <span className="text-[#340062] font-medium">
+                        {idx === 0 ? '1st Choice: ' : idx === 1 ? '2nd Choice: ' : '3rd Choice: '}
+                      </span>
+                      <span className="ml-2 text-[#11014c]">{role}</span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-[#11014c] opacity-70">No role preferences specified</p>
+                )}
+              </div>
+            </div>
+            
+            {/* Domain Interests */}
+            <div className="border border-[#b6cbff] rounded-lg p-6">
+              <div className="flex items-center mb-4">
+                <div className="bg-[#f6ebff] p-3 rounded-full mr-3">
+                  <FiLayers size={20} color="#340062" />
+                </div>
+                <h4 className="font-bold text-[#340062]">Domain Interests</h4>
+              </div>
+              
+              <div className="space-y-2">
+                {hackathonPreferences.domainInterests && hackathonPreferences.domainInterests.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {hackathonPreferences.domainInterests.map((domain, idx) => (
+                      <span key={idx} className="bg-[#f6ebff] px-3 py-1 rounded-full text-[#340062]">
+                        {domain}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[#11014c] opacity-70">No domain interests specified</p>
+                )}
+              </div>
+            </div>
+            
+            {/* Experience Level */}
+            <div className="border border-[#b6cbff] rounded-lg p-6">
+              <div className="flex items-center mb-4">
+                <div className="bg-[#f6ebff] p-3 rounded-full mr-3">
+                  <FiAward size={20} color="#340062" />
+                </div>
+                <h4 className="font-bold text-[#340062]">Experience Level</h4>
+              </div>
+              
+              <div>
+                {hackathonPreferences.experienceLevel ? (
+                  <>
+                    <div className="mb-2">
+                      <span className="text-[#11014c] font-medium">Hackathon Experience:</span>
+                      <span className="ml-2 text-[#340062]">{hackathonPreferences.experienceLevel}</span>
+                    </div>
+                    <div>
+                      <span className="text-[#11014c] font-medium">Participated In:</span>
+                      <span className="ml-2 text-[#340062]">
+                        {hackathonPreferences.hackathonsParticipated || 0} hackathons
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-[#11014c] opacity-70">No experience level specified</p>
+                )}
+              </div>
+            </div>
+            
+            {/* Collaboration Preferences */}
+            <div className="border border-[#b6cbff] rounded-lg p-6">
+              <div className="flex items-center mb-4">
+                <div className="bg-[#f6ebff] p-3 rounded-full mr-3">
+                  <FiUser size={20} color="#340062" />
+                </div>
+                <h4 className="font-bold text-[#340062]">Collaboration Preferences</h4>
+              </div>
+              
+              <div className="space-y-2">
+                {hackathonPreferences.teamSize ? (
+                  <>
+                    <div className="flex items-center">
+                      <span className="text-[#11014c] font-medium">Preferred Team Size:</span>
+                      <span className="ml-2 text-[#340062]">{hackathonPreferences.teamSize}</span>
+                    </div>
+                    
+                    <div className="flex items-center">
+                      <span className="text-[#11014c] font-medium">Communication:</span>
+                      <span className="ml-2 text-[#340062]">{hackathonPreferences.communicationPreference}</span>
+                    </div>
+                    
+                    <div className="flex items-center">
+                      <span className="text-[#11014c] font-medium">Work Style:</span>
+                      <span className="ml-2 text-[#340062]">{hackathonPreferences.workStyle}</span>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-[#11014c] opacity-70">No collaboration preferences specified</p>
+                )}
+              </div>
+            </div>
+            
+            {/* Availability */}
+            <div className="md:col-span-2 border border-[#b6cbff] rounded-lg p-6">
+              <div className="flex items-center mb-4">
+                <div className="bg-[#f6ebff] p-3 rounded-full mr-3">
+                  <FiClock size={20} color="#340062" />
+                </div>
+                <h4 className="font-bold text-[#340062]">Availability</h4>
+              </div>
+              
+              <div className="space-y-2">
+                {hackathonPreferences.availability ? (
+                  <>
+                    <div className="flex items-center">
+                      <span className="text-[#11014c] font-medium">Typical Availability:</span>
+                      <span className="ml-2 text-[#340062]">{hackathonPreferences.availability}</span>
+                    </div>
+                    
+                    <div className="flex items-center">
+                      <span className="text-[#11014c] font-medium">Time Zone:</span>
+                      <span className="ml-2 text-[#340062]">{hackathonPreferences.timezone || 'Not specified'}</span>
+                    </div>
+                    
+                    <div className="flex items-center">
+                      <span className="text-[#11014c] font-medium">Weekly Commitment:</span>
+                      <span className="ml-2 text-[#340062]">
+                        {hackathonPreferences.weeklyCommitment || 'Not specified'}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-[#11014c] opacity-70">No availability information specified</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+  
   // Helper function to get tab description
   const getTabDescription = (tab) => {
     switch(tab) {
@@ -64,6 +270,7 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
       case 'Work Experience': return 'Your internships and job details';
       case 'Achievements': return 'Your awards and recognitions';
       case 'Certifications': return 'Professional certifications and courses';
+      case 'Hackathon Preferences': return 'Your hackathon roles and preferences for better team matching';
       default: return '';
     }
   };
@@ -79,12 +286,16 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
         );
       case 'Projects':
         return <FiExternalLink size={24} color="#340062" />;
+      case 'Position of Responsibility':
+        return <FiUser size={24} color="#340062" />;
       case 'Work Experience':
-        return (
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 6H16V4C16 2.9 15.1 2 14 2H10C8.9 2 8 2.9 8 4V6H4C2.9 6 2 6.9 2 8V19C2 20.1 2.9 21 4 21H20C21.1 21 22 20.1 22 19V8C22 6.9 21.1 6 20 6ZM10 4H14V6H10V4ZM20 19H4V8H20V19Z" fill="#340062"/>
-          </svg>
-        );
+        return <FiBriefcase size={24} color="#340062" />;
+      case 'Achievements':
+        return <FiAward size={24} color="#340062" />;
+      case 'Certifications':
+        return <FiCheck size={24} color="#340062" />;
+      case 'Hackathon Preferences':
+        return <FiCode size={24} color="#340062" />;
       default:
         return <FiEdit2 size={24} color="#340062" />;
     }
@@ -102,6 +313,7 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
                 onClick={() => onEditItem(tabType, index, item)}
                 className="bg-[#f6ebff] p-2 rounded-full text-[#340062] hover:bg-[#340062] hover:text-white transition"
                 aria-label="Edit"
+                type="button"
               >
                 <FiEdit2 size={16} />
               </button>
@@ -109,26 +321,36 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
                 onClick={() => onDeleteItem(tabType, index)}
                 className="bg-[#f6ebff] p-2 rounded-full text-red-600 hover:bg-red-600 hover:text-white transition"
                 aria-label="Delete"
+                type="button"
               >
                 <FiTrash2 size={16} />
               </button>
             </div>
             
+            {/* Content for each tab type */}
             {tabType === 'Education' && (
               <div>
-                <h4 className="font-bold text-[#340062]">{item.university || item.school}</h4>
-                <p className="text-[#11014c]">{item.degree} in {item.fieldOfStudy}</p>
+                <h4 className="font-bold text-[#340062] pr-12">
+                  {item.university || item.school || "Educational Institution"}
+                </h4>
+                <p className="text-[#11014c]">
+                  {item.degree || "Degree"} {item.fieldOfStudy ? `in ${item.fieldOfStudy}` : ""}
+                </p>
                 <div className="flex justify-between mt-2">
-                  <span className="text-sm text-[#11014c] opacity-70">{item.startYear} - {item.endYear}</span>
-                  <span className="text-sm text-[#11014c]">Grade: {item.grade}</span>
+                  <span className="text-sm text-[#11014c] opacity-70">
+                    {item.startYear || "Start Year"} - {item.endYear || "End Year"}
+                  </span>
+                  <span className="text-sm text-[#11014c]">
+                    {item.grade ? `Grade: ${item.grade}` : ""}
+                  </span>
                 </div>
               </div>
             )}
             
             {tabType === 'Projects' && (
               <div>
-                <h4 className="font-bold text-[#340062]">{item.title}</h4>
-                <p className="text-[#11014c] my-2">{item.description}</p>
+                <h4 className="font-bold text-[#340062] pr-12">{item.title || "Project Title"}</h4>
+                <p className="text-[#11014c] my-2">{item.description || ""}</p>
                 <div className="flex flex-wrap gap-2 my-2">
                   {item.technologies && item.technologies.split(',').map((tech, i) => (
                     <span key={i} className="bg-[#f6ebff] px-3 py-1 rounded-full text-xs text-[#340062]">
@@ -137,9 +359,11 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
                   ))}
                 </div>
                 <div className="flex justify-between mt-2">
-                  <span className="text-sm text-[#11014c] opacity-70">{item.startDate} - {item.endDate}</span>
+                  <span className="text-sm text-[#11014c] opacity-70">
+                    {item.startDate || ""} {item.endDate ? `- ${item.endDate}` : ""}
+                  </span>
                   {item.url && (
-                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-sm text-[#340062] flex items-center">
+                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-sm text-[#340062] flex items-center hover:underline">
                       View Project <FiExternalLink className="ml-1" />
                     </a>
                   )}
@@ -149,40 +373,46 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
             
             {tabType === 'Work Experience' && (
               <div>
-                <h4 className="font-bold text-[#340062]">{item.company}</h4>
-                <p className="text-[#11014c]">{item.position} • {item.employmentType}</p>
-                <p className="text-sm text-[#11014c] my-2">{item.description}</p>
-                <span className="text-sm text-[#11014c] opacity-70">{item.startDate} - {item.endDate}</span>
+                <h4 className="font-bold text-[#340062] pr-12">{item.company || "Company Name"}</h4>
+                <p className="text-[#11014c]">
+                  {item.position || "Position"} {item.employmentType ? `• ${item.employmentType}` : ""}
+                </p>
+                <p className="text-sm text-[#11014c] my-2">{item.description || ""}</p>
+                <span className="text-sm text-[#11014c] opacity-70">
+                  {item.startDate || ""} {item.endDate ? `- ${item.endDate}` : ""}
+                </span>
               </div>
             )}
             
             {tabType === 'Position of Responsibility' && (
               <div>
-                <h4 className="font-bold text-[#340062]">{item.title}</h4>
-                <p className="text-[#11014c]">{item.organization}</p>
-                <p className="text-sm text-[#11014c] my-2">{item.description}</p>
-                <span className="text-sm text-[#11014c] opacity-70">{item.startDate} - {item.endDate}</span>
+                <h4 className="font-bold text-[#340062] pr-12">{item.title || "Position Title"}</h4>
+                <p className="text-[#11014c]">{item.organization || "Organization"}</p>
+                <p className="text-sm text-[#11014c] my-2">{item.description || ""}</p>
+                <span className="text-sm text-[#11014c] opacity-70">
+                  {item.startDate || ""} {item.endDate ? `- ${item.endDate}` : ""}
+                </span>
               </div>
             )}
             
             {tabType === 'Achievements' && (
               <div>
-                <h4 className="font-bold text-[#340062]">{item.title}</h4>
-                <p className="text-[#11014c]">{item.issuer}</p>
-                <p className="text-sm text-[#11014c] my-2">{item.description}</p>
-                <span className="text-sm text-[#11014c] opacity-70">{item.date}</span>
+                <h4 className="font-bold text-[#340062] pr-12">{item.title || "Achievement Title"}</h4>
+                <p className="text-[#11014c]">{item.issuer || "Issuer"}</p>
+                <p className="text-sm text-[#11014c] my-2">{item.description || ""}</p>
+                <span className="text-sm text-[#11014c] opacity-70">{item.date || ""}</span>
               </div>
             )}
             
             {tabType === 'Certifications' && (
               <div>
-                <h4 className="font-bold text-[#340062]">{item.title}</h4>
-                <p className="text-[#11014c]">{item.issuer}</p>
-                <p className="text-sm text-[#11014c] my-2">{item.description}</p>
+                <h4 className="font-bold text-[#340062] pr-12">{item.title || "Certification Name"}</h4>
+                <p className="text-[#11014c]">{item.issuer || "Issuer"}</p>
+                <p className="text-sm text-[#11014c] my-2">{item.description || ""}</p>
                 <div className="flex justify-between">
-                  <span className="text-sm text-[#11014c] opacity-70">{item.date}</span>
+                  <span className="text-sm text-[#11014c] opacity-70">{item.date || ""}</span>
                   {item.url && (
-                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-sm text-[#340062] flex items-center">
+                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-sm text-[#340062] flex items-center hover:underline">
                       View Certificate <FiExternalLink className="ml-1" />
                     </a>
                   )}
@@ -195,31 +425,39 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
     );
   };
 
+  // Calculate health once per render
+  const healthPercentage = calculateProfileHealth();
+  const suggestion = getSuggestionForProfileCompletion();
+
   return (
-    <div className="w-full bg-[#f6ebff] bg-opacity-30 min-h-screen font-dmsans">
+    <div className="w-full bg-[#f6ebff] bg-opacity-30 h-max font-dmsans">
       {/* Header Profile Section */}
       <div className="bg-white p-6 rounded-lg shadow-sm mb-4">
+        
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="flex items-start gap-4">
             <div className="flex-shrink-0 w-16 h-16 bg-[#340062] rounded-full flex items-center justify-center text-white text-2xl font-bold">
-              T
+              {userInitial}
             </div>
             <div>
               <h1 className="text-xl font-bold text-[#340062]">Tanish Shah</h1>
-              <p className="text-[#11014c]">Frontend Developer</p>
-              <p className="text-sm text-[#11014c] opacity-70">Dwarkadas J. Sanghvi College of Engineering • 2027 Pass out</p>
+              <p className="text-sm text-[#11014c] mt-1">@{username || 'tanishshah20'}</p>
             </div>
           </div>
           <div className="mt-4 md:mt-0 flex gap-3">
-            <button className="px-6 py-2 border border-[#340062] text-[#340062] font-medium rounded-md">
-              Edit
-            </button>
-            <button className="px-6 py-2 bg-[#340062] text-white font-medium rounded-md">
-              Your Resume
+            {/* Added View Profile button */}
+            <button 
+              type="button" 
+              onClick={handleViewProfile}
+              className="px-6 py-2 bg-[#f6ebff] border border-[#340062] text-[#340062] font-medium rounded-md hover:bg-[#ebd9ff] transition-colors flex items-center"
+            >
+              <FiEye className="mr-2" /> View Profile
             </button>
           </div>
         </div>
       </div>
+
+      <ResumeUpload currentUser={username} />
 
       {/* Tabs Section */}
       <div className="bg-white rounded-lg shadow-sm">
@@ -229,10 +467,11 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
               {tabs.map((tab) => (
                 <button
                   key={tab}
-                  className={`px-6 py-3 font-medium ${
+                  type="button"
+                  className={`px-6 py-3 font-medium transition-colors ${
                     activeTab === tab
                       ? "text-[#340062] border-b-2 border-[#340062]"
-                      : "text-[#11014c] opacity-70"
+                      : "text-[#11014c] opacity-70 hover:opacity-100"
                   }`}
                   onClick={() => setActiveTab(tab)}
                 >
@@ -253,8 +492,8 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
       <div className="mt-6 bg-white p-6 rounded-lg shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-bold text-[#340062]">Profile Health:</h3>
-          <span className={`${calculateProfileHealth() > 50 ? "text-[#340062]" : "text-[#FF6B6B]"}`}>
-            {calculateProfileHealth() > 75 ? "EXCELLENT" : calculateProfileHealth() > 50 ? "GOOD" : "AVERAGE"}
+          <span className={`${healthPercentage > 50 ? "text-[#340062]" : "text-[#FF6B6B]"}`}>
+            {healthPercentage > 75 ? "EXCELLENT" : healthPercentage > 50 ? "GOOD" : "AVERAGE"}
           </span>
         </div>
         
@@ -265,21 +504,21 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
         {/* Progress Bar */}
         <div className="w-full bg-[#f6ebff] rounded-full h-2 mb-1">
           <div 
-            className={`h-2 rounded-full ${calculateProfileHealth() > 50 ? "bg-[#340062]" : "bg-[#FF6B6B]"}`} 
-            style={{width: `${calculateProfileHealth()}%`}}
+            className={`h-2 rounded-full ${healthPercentage > 50 ? "bg-[#340062]" : "bg-[#FF6B6B]"}`} 
+            style={{width: `${healthPercentage}%`}}
           ></div>
         </div>
         <div className="flex justify-between mb-6">
-          <span className={`text-sm font-medium ${calculateProfileHealth() > 50 ? "text-[#340062]" : "text-[#FF6B6B]"}`}>
-            {calculateProfileHealth()}% completed
+          <span className={`text-sm font-medium ${healthPercentage > 50 ? "text-[#340062]" : "text-[#FF6B6B]"}`}>
+            {healthPercentage}% completed
           </span>
           <div className="flex">
             {[...Array(5)].map((_, i) => (
               <div 
                 key={i}
                 className={`w-2 h-2 rounded-full mx-1 mt-1 ${
-                  i < Math.ceil(calculateProfileHealth() / 20) ? 
-                    (calculateProfileHealth() > 50 ? "bg-[#340062]" : "bg-[#FF6B6B]") : 
+                  i < Math.ceil(healthPercentage / 20) ? 
+                    (healthPercentage > 50 ? "bg-[#340062]" : "bg-[#FF6B6B]") : 
                     "bg-[#f6ebff]"
                 }`}
               ></div>
@@ -287,45 +526,28 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
           </div>
         </div>
         
-        <button className={`text-sm font-medium ${calculateProfileHealth() > 50 ? "text-[#340062]" : "text-[#FF6B6B]"}`}>
-          {getSuggestionForProfileCompletion()}
+        <button 
+          type="button"
+          className={`text-sm font-medium ${healthPercentage > 50 ? "text-[#340062]" : "text-[#FF6B6B]"} hover:underline`}>
+          {suggestion}
         </button>
-      </div>
-
-      {/* Other sections - Tagline, Skills, etc. */}
-      <div className="mt-6 bg-white p-6 rounded-lg shadow-sm">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-[#340062]">Tagline</h3>
-          <button className="text-[#340062] border border-[#340062] rounded p-1">
-            <FiEdit2 size={16} />
-          </button>
-        </div>
-        <p className="text-[#11014c] opacity-70">No Tagline Added</p>
-      </div>
-
-      <div className="mt-6 bg-white p-6 rounded-lg shadow-sm">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-[#340062]">Skills</h3>
-          <button className="text-[#340062] border border-[#340062] rounded p-1">
-            <FiEdit2 size={16} />
-          </button>
-        </div>
-        <p className="text-[#11014c] opacity-70">No Skills Added</p>
       </div>
     </div>
   );
   
   // Function to calculate profile health percentage
   function calculateProfileHealth() {
-    const totalSections = 8; // Tabs + Tagline + Skills
+    const totalSections = 11; // Tabs + Tagline + Skills + Social Links + Hackathon Preferences
     let completedSections = 0;
     
     // Check tabs with data
-    Object.values(profileData).forEach(data => {
-      if (data.length > 0) completedSections++;
+    Object.entries(profileData).forEach(([key, data]) => {
+      if (key === 'Social Links' || key === 'Hackathon Preferences' || key === 'Tagline') {
+        if ((typeof data === 'string' && data) || (data && Object.keys(data).length > 0)) completedSections++;
+      } else if (data && Array.isArray(data) && data.length > 0) {
+        completedSections++;
+      }
     });
-    
-    // Hard-coded as 0 for now (Tagline and Skills)
     
     return Math.round((completedSections / totalSections) * 100);
   }
@@ -336,8 +558,14 @@ const ProfileSection = ({ onOpenModal, onEditItem, onDeleteItem, profileData }) 
       return "Add 1 Project to improve your profile health";
     } else if (!profileData.Education || profileData.Education.length === 0) {
       return "Add your Education details to improve your profile health";
+    } else if (!profileData['Hackathon Preferences'] || Object.keys(profileData['Hackathon Preferences']).length === 0) {
+      return "Add Hackathon Preferences to improve team matching";
+    } else if (!profileData.Skills || profileData.Skills.length === 0) {
+      return "Add Skills to improve your profile health";
     } else if (!profileData['Work Experience'] || profileData['Work Experience'].length === 0) {
       return "Add Work Experience to improve your profile health";
+    } else if (!profileData.Tagline) {
+      return "Add a Tagline to improve your profile";
     }
     return "Complete your profile to improve visibility";
   }
