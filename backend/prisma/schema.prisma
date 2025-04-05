@@ -95,8 +95,8 @@ model Hackathon {
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
   aiInsights   Json?
-  teamId       String?             @unique
   domains      String[]
+  teamId       String?             @unique
   team         Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
   timeline     HackathonTimeline[] @relation("HackathonTimeline")
   users        User[]              @relation("UserHackathons")
