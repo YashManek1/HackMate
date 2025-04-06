@@ -1,5 +1,5 @@
 // src/Sidebar.jsx
-import React, { useState } from "react";
+import React, { useState, createContext, useContext, useEffect } from "react";
 import "../Styles/Sidebar.css";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import {
@@ -15,6 +15,21 @@ import {
 } from "react-icons/fi";
 import { FaUser } from "react-icons/fa";
 import { motion } from "framer-motion";
+
+// Create context for sidebar state
+export const SidebarContext = createContext();
+
+export const useSidebar = () => useContext(SidebarContext);
+
+export const SidebarProvider = ({ children }) => {
+  const [open, setOpen] = useState(true);
+  
+  return (
+    <SidebarContext.Provider value={{ open, setOpen }}>
+      {children}
+    </SidebarContext.Provider>
+  );
+};
 
 export const Sidebar = () => {
   return (
@@ -36,6 +51,29 @@ const SidebarLeft = () => {
     currentPath.split("/").pop().charAt(0).toUpperCase() + currentPath.split("/").pop().slice(1) || "Dashboard"
   );
 
+  // Update selected based on URL changes
+  useEffect(() => {
+    const path = currentPath;
+    
+    if (path.includes("/dashboard/resources")) {
+      setSelected("Resources");
+    } else if (path === "/dashboard") {
+      setSelected("Dashboard");
+    } else if (path.includes("/dashboard/hackathons")) {
+      setSelected("Hackathons");
+    } else if (path.includes("/dashboard/community")) {
+      setSelected("Community");
+    } else if (path.includes("/dashboard/profile")) {
+      setSelected("Profile");
+    } else if (path.includes("/dashboard/products")) {
+      setSelected("Products");
+    } else if (path.includes("/dashboard/tags")) {
+      setSelected("Tags");
+    } else if (path.includes("/dashboard/analytics")) {
+      setSelected("Analytics");
+    }
+  }, [currentPath]);
+
   return (
     <motion.nav
       layout
@@ -44,6 +82,7 @@ const SidebarLeft = () => {
         width: open ? "225px" : "fit-content",
         fontFamily: "var(--font-poppins)",
       }}
+      data-state={open ? "open" : "closed"}
     >
       <TitleSection open={open} />
 
@@ -207,33 +246,6 @@ const TitleSection = ({ open }) => {
         {open && <FiChevronDown className="mr-2 text-[#340062]" />}
       </div>
     </div>
-  );
-};
-
-const Logo = () => {
-  return (
-    <motion.div
-      layout
-      className="grid size-10 shrink-0 place-content-center rounded-md bg-[#340062]"
-    >
-      <svg
-        width="24"
-        height="auto"
-        viewBox="0 0 50 39"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="fill-white"
-      >
-        <path
-          d="M16.4992 2H37.5808L22.0816 24.9729H1L16.4992 2Z"
-          stopColor="#000000"
-        ></path>
-        <path
-          d="M17.4224 27.102L11.4192 36H33.5008L49 13.0271H32.7024L23.2064 27.102H17.4224Z"
-          stopColor="#000000"
-        ></path>
-      </svg>
-    </motion.div>
   );
 };
 
