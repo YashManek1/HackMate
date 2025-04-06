@@ -9,6 +9,7 @@ import ResourcePage from "./ResourcePage";
 import Community from "../Dashboard_/Community.jsx";
 import Profile from "../Dashboard_/Profile/Profile.jsx";
 import Sidebar from "../../Component/Sidebar.jsx"; // Import your Sidebar component
+import ProfileView from "./Profile/ProfileView.jsx";
 
 const DashApp = () => {
   const location = useLocation();
@@ -56,6 +57,7 @@ const DashApp = () => {
             <Route path="resources/:slug" element={<ResourcePage />} />
             <Route path="community" element={<Community />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="profile/view" element={<ProfileView />} />
             
             {/* Routes for other sidebar items */}
             <Route path="products" element={<div>Products Page</div>} />
