@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { resources } from "../../Data/ResourceData.js";
-import "../../Styles/Resources.css";
-import BackButton from "../../Component/BackButton.jsx";
-import SearchBar from "../../Component/SearchBar.jsx";
+import { resources } from "../../../Data/ResourceData.js";
+import "../../../Styles/Resources.css";
+import BackButton from "../../../Component/BackButton.jsx";
+import SearchBar from "../../../Component/SearchBar.jsx";
 
 const ResourcePage = () => {
   const { slug } = useParams();

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
-import hackathonData from "../../Data/HackathonResource.js"; 
+import hackathonData from "../../../Data/HackathonResource.js"; 
 
 const Hackathons = () => {
   const [filter, setFilter] = useState("all");

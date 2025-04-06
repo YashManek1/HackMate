@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { resources } from "../../Data/ResourceData.js";
-import "../../Styles/Resources.css";
-import SearchBar from "../../Component/SearchBar.jsx";
+import { resources } from "../../../Data/ResourceData.js";
+import "../../../Styles/Resources.css";
+import SearchBar from "../../../Component/SearchBar.jsx";
 
 const Resources = () => {
   const navigate = useNavigate();
