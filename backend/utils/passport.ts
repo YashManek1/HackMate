@@ -138,7 +138,6 @@ passport.use(
               email: profile.emails?.[0]?.value || "default@example.com",
               name: profile.displayName || profile.username || "Unknown",
               avatarUrl: profile.photos?.[0]?.value,
-              role: "PARTICIPANT",
               isEmailVerified: true,
               status: "active",
             },

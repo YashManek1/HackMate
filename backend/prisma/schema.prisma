@@ -66,13 +66,13 @@ model Skill {
 
 model Team {
   id                String       @id @default(uuid())
+  teamCode          String       @unique
   name              String
   description       String?
   lookingForMembers Boolean      @default(false)
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
   leaderId          String
-  teamCode          String       @unique // Added field for team code
   hackathon         Hackathon?
   project           Project?
   tasks             Task[]       @relation("TeamTasks")
@@ -82,9 +82,7 @@ model Team {
 }
 
 model Hackathon {
-  id           String              @id @default(uuid())
-  teamId       String?             @unique
-  team         Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  id           String              @id @default(uuid()) @db.Uuid
   name         String
   description  String?
   startDate    String
@@ -92,23 +90,25 @@ model Hackathon {
   location     String?
   rules        String?
   prizeDetails Json?
-  domains      String[]
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
   aiInsights   Json?
+  domains      String[]
+  teamId       String?             @unique
+  team         Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
   timeline     HackathonTimeline[] @relation("HackathonTimeline")
   users        User[]              @relation("UserHackathons")
 }
 
 model HackathonTimeline {
-  id          String    @id @default(uuid())
-  hackathonId String
+  id          String     @id @default(uuid())
+  hackathonId String?    @db.Uuid
   eventName   String
   eventTime   DateTime
   description String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  hackathon   Hackathon @relation("HackathonTimeline", fields: [hackathonId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  hackathon   Hackathon? @relation("HackathonTimeline", fields: [hackathonId], references: [id], onDelete: Cascade)
 }
 
 model Project {
@@ -116,6 +116,7 @@ model Project {
   name                     String
   description              String?
   teamId                   String               @unique
+  hackathonId              String?              @db.Uuid
   createdAt                DateTime             @default(now())
   updatedAt                DateTime             @updatedAt
   totalCommits             Int                  @default(0)
