@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import "./index.css";
 import DashApp from "./Pages/Dashboard_/DashApp.jsx";
 import LoginPage from "./Pages/Login_signup/LoginPage.jsx";
@@ -7,7 +7,42 @@ import SignUpPage from "./Pages/Login_signup/SignUpPage.jsx";
 import NotFound from "./Pages/NotFound Page/NotFound.jsx";
 import Home from "./Pages/Landing/Home.jsx";
 import ScrollToTop from "./ScrollToTop.jsx";
-import { SidebarProvider } from "../src/Component/Sidebar.jsx"; // Import SidebarProvider
+
+// Dashboard components
+import Hackathons from "./Pages/Dashboard_/Hackathon_page/Hackathons.jsx";
+import HackathonDetails from "./Pages/Dashboard_/Hackathon_page/HackathonDeatils.jsx";
+import Resources from "./Pages/Dashboard_/Resources_page/Resources.jsx";
+import ResourcePage from "./Pages/Dashboard_/Resources_page/ResourcePage.jsx";
+import Community from "./Pages/Dashboard_/Community_page/Community.jsx";
+import Profile from "./Pages/Dashboard_/Profile/Profile.jsx";
+import ProfileView from "./Pages/Dashboard_/Profile/ProfileView.jsx";
+
+// Error Boundary Component
+class ErrorBoundary extends React.Component {
+  state = { hasError: false };
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("Error caught by boundary:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex items-center justify-center min-h-screen bg-light-primary">
+          <h2 className="text-2xl text-dark-primary font-poppins">
+            Something went wrong. Please try again later.
+          </h2>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 const App = () => {
   // Mock authentication (replace with real auth logic)
   const isAuthenticated = true;
@@ -24,16 +59,22 @@ const App = () => {
         {/* Protected Dashboard Routes */}
         <Route
           path="/dashboard/*"
-          element={
-            isAuthenticated ? (
-              <SidebarProvider>
-                <DashApp />
-              </SidebarProvider>
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
+          element={isAuthenticated ? <DashApp /> : <Navigate to="/login" />}
+        >
+          {/* These routes will be rendered inside the <Outlet /> in DashApp */}
+          <Route path="hackathons" element={<ErrorBoundary><Hackathons /></ErrorBoundary>} />
+          <Route path="hackathon/:id" element={<ErrorBoundary><HackathonDetails /></ErrorBoundary>} />
+          <Route path="resources" element={<ErrorBoundary><Resources /></ErrorBoundary>} />
+          <Route path="resources/:slug" element={<ErrorBoundary><ResourcePage /></ErrorBoundary>} />
+          <Route path="community" element={<ErrorBoundary><Community /></ErrorBoundary>} />
+          <Route path="profile" element={<ErrorBoundary><Profile /></ErrorBoundary>} />
+          <Route path="profile/view" element={<ErrorBoundary><ProfileView /></ErrorBoundary>} />
+          
+          {/* Placeholder routes for other sidebar items */}
+          <Route path="products" element={<div className="p-4">Products Page</div>} />
+          <Route path="tags" element={<div className="p-4">Tags Page</div>} />
+          <Route path="analytics" element={<div className="p-4">Analytics Page</div>} />
+        </Route>
 
         {/* Fallback Route */}
         <Route path="*" element={<NotFound />} />
