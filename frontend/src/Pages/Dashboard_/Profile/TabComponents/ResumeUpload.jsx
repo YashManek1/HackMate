@@ -6,7 +6,6 @@ const ResumeUpload = ({ currentUser }) => {
   const [resumePreview, setResumePreview] = useState(null);
   const [resumeUploaded, setResumeUploaded] = useState(false);
   const [uploadError, setUploadError] = useState(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
   const fileInputRef = useRef(null);
   
   useEffect(() => {
@@ -92,7 +91,7 @@ const ResumeUpload = ({ currentUser }) => {
       
       <div className="flex flex-col md:flex-row gap-6 items-start">
         {/* Left side - Upload Area */}
-        <div className="w-full md:w-1/2 border-2 border-dashed border-[#b6cbff] rounded-lg p-8 flex flex-col items-center justify-center">
+        <div className="w-full border-2 border-dashed border-[#b6cbff] rounded-lg p-8 flex flex-col items-center justify-center">
           {!resumeUploaded ? (
             <>
               <div className="bg-[#f6ebff] p-4 rounded-full mb-4">
@@ -151,150 +150,7 @@ const ResumeUpload = ({ currentUser }) => {
             </>
           )}
         </div>
-        
-        {/* Right side - Preview or Tips */}
-        <div className="w-full md:w-1/2">
-          {resumeUploaded ? (
-            <div className="border border-[#b6cbff] rounded-lg h-full flex flex-col">
-              <div className="bg-[#f6ebff] p-4 border-b border-[#b6cbff] flex justify-between items-center">
-                <h3 className="font-bold text-[#340062]">Resume Preview</h3>
-                <button
-                  onClick={openResumePreview}
-                  className="text-[#340062] hover:underline flex items-center text-sm"
-                >
-                  <FiEye className="mr-1" /> Open Full Preview
-                </button>
-              </div>
-              <div className="p-4 flex-grow">
-                {resumePreview && resumePreview.includes('.pdf') ? (
-                  <div className="h-64 overflow-hidden rounded border border-gray-200">
-                    <object
-                      data={resumePreview}
-                      type="application/pdf"
-                      width="100%"
-                      height="100%"
-                      className="rounded"
-                    >
-                      <div className="h-full w-full flex items-center justify-center bg-gray-100 text-center p-4">
-                        <p>
-                          Your browser doesn't support PDF preview.
-                          <br />
-                          <button
-                            onClick={openResumePreview}
-                            className="text-[#340062] underline mt-2"
-                          >
-                            Click here to open in a new tab
-                          </button>
-                        </p>
-                      </div>
-                    </object>
-                  </div>
-                ) : (
-                  <div className="h-64 flex items-center justify-center bg-gray-100 rounded text-center p-4">
-                    <div>
-                      <FiFileText size={48} className="mx-auto mb-4 text-[#340062]" />
-                      <p className="mb-2">
-                        {resumeFile?.name.endsWith('.docx') ? 'DOCX preview not available' : 'Preview not available'}
-                      </p>
-                      <button
-                        onClick={openResumePreview}
-                        className="text-[#340062] underline"
-                      >
-                        Open in a new tab
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="bg-[#f6ebff] bg-opacity-50 p-4 border-t border-[#b6cbff]">
-                <div className="flex gap-2 items-center">
-                  <FiDownload className="text-[#340062]" />
-                  <span className="text-sm text-[#11014c]">
-                    Your resume is ready to be shared with employers
-                  </span>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="border border-[#b6cbff] rounded-lg p-6 h-full">
-              <h3 className="font-bold text-lg mb-4 text-[#340062]">Resume Tips</h3>
-              <ul className="space-y-3 text-[#11014c]">
-                <li className="flex items-start">
-                  <div className="flex-shrink-0 h-5 w-5 rounded-full bg-[#f6ebff] flex items-center justify-center mr-2 mt-0.5">
-                    <span className="text-xs font-bold text-[#340062]">1</span>
-                  </div>
-                  <span>Keep your resume concise and limit it to 1-2 pages</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="flex-shrink-0 h-5 w-5 rounded-full bg-[#f6ebff] flex items-center justify-center mr-2 mt-0.5">
-                    <span className="text-xs font-bold text-[#340062]">2</span>
-                  </div>
-                  <span>Highlight your achievements with quantifiable results</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="flex-shrink-0 h-5 w-5 rounded-full bg-[#f6ebff] flex items-center justify-center mr-2 mt-0.5">
-                    <span className="text-xs font-bold text-[#340062]">3</span>
-                  </div>
-                  <span>Tailor your resume to match job descriptions</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="flex-shrink-0 h-5 w-5 rounded-full bg-[#f6ebff] flex items-center justify-center mr-2 mt-0.5">
-                    <span className="text-xs font-bold text-[#340062]">4</span>
-                  </div>
-                  <span>Use a clean, professional design with consistent formatting</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="flex-shrink-0 h-5 w-5 rounded-full bg-[#f6ebff] flex items-center justify-center mr-2 mt-0.5">
-                    <span className="text-xs font-bold text-[#340062]">5</span>
-                  </div>
-                  <span>Proofread carefully to avoid spelling and grammar errors</span>
-                </li>
-              </ul>
-            </div>
-          )}
-        </div>
       </div>
-      
-      {/* Resume Preview Modal */}
-      {previewOpen && resumePreview && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl h-[80vh] flex flex-col">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="font-bold text-[#340062]">Resume Preview</h3>
-              <button 
-                onClick={() => setPreviewOpen(false)}
-                className="text-[#11014c] hover:text-[#340062]"
-              >
-                Close
-              </button>
-            </div>
-            <div className="flex-grow p-4 overflow-auto">
-              {resumePreview.includes('.pdf') ? (
-                <iframe 
-                  src={`${resumePreview}#toolbar=0&navpanes=0`} 
-                  width="100%" 
-                  height="100%" 
-                  className="border-0"
-                  title="Resume Preview"
-                ></iframe>
-              ) : (
-                <div className="h-full flex items-center justify-center bg-gray-100">
-                  <div className="text-center">
-                    <FiFileText size={64} className="mx-auto mb-4 text-[#340062]" />
-                    <p className="mb-3">Preview not available for this file format</p>
-                    <button
-                      onClick={openResumePreview}
-                      className="px-4 py-2 bg-[#340062] text-white rounded-md"
-                    >
-                      Open in new tab
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

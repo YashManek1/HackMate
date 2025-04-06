@@ -4,6 +4,7 @@ import FormModal from './FormModal';
 import SkillsTab from './TabComponents/SkillsTab';
 import SocialLinksTab from './TabComponents/SocialLinksTab';
 import TaglineTab from './TabComponents/TagLineTab';
+import BadgesTab from './TabComponents/BadgesTab';
 
 const Profile = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -182,6 +183,8 @@ const Profile = () => {
       
       {/* Reorganized Content Area - TagLine, Skills, and Social Links */}
       <div className="mt-6">
+        <BadgesTab />
+        
         <TaglineTab 
           tagline={profileData.Tagline}
           onEditTagline={handleEditTagline}
