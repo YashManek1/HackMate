@@ -2,9 +2,9 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import "./index.css";
 import DashApp from "./Pages/Dashboard_/DashApp.jsx";
-import LoginPage from "./Pages/LoginPage";
-import SignUpPage from "./Pages/SignUpPage";
-import NotFound from "./Pages/NotFound.jsx";
+import LoginPage from "./Pages/Login_signup/LoginPage.jsx";
+import SignUpPage from "./Pages/Login_signup/SignUpPage.jsx";
+import NotFound from "./Pages/NotFound Page/NotFound.jsx";
 import Home from "./Pages/Landing/Home.jsx";
 import ScrollToTop from "./ScrollToTop.jsx";
 import { SidebarProvider } from "../src/Component/Sidebar.jsx"; // Import SidebarProvider

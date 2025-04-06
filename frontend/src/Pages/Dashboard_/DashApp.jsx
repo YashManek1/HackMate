@@ -1,12 +1,12 @@
 import React from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Routes, Route, Navigate } from "react-router-dom";
-import Dashboard from "../Dashboard_/Dashboard.jsx";
-import Hackathons from "./Hackathons";
-import HackathonDetails from "../HackathonDeatils";
-import Resources from "./Resources";
-import ResourcePage from "./ResourcePage";
-import Community from "../Dashboard_/Community.jsx";
+import Dashboard from "./Landing_Dashboard/Dashboard.jsx";
+import Hackathons from "./Hackathon_page/Hackathons.jsx";
+import HackathonDetails from "./Hackathon_page/HackathonDeatils.jsx";
+import Resources from "./Resources_page/Resources.jsx";
+import ResourcePage from "./Resources_page/ResourcePage.jsx";
+import Community from "./Community_page/Community.jsx";
 import Profile from "../Dashboard_/Profile/Profile.jsx";
 import Sidebar from "../../Component/Sidebar.jsx"; // Import your Sidebar component
 import ProfileView from "./Profile/ProfileView.jsx";

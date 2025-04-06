@@ -1,5 +1,5 @@
 import React from 'react';
-import "../Component/SearchBar.css";
+import "../Styles/SearchBar.css"; // Import your CSS file for styling
 
 const SearchBar = ({ searchTerm, setSearchTerm }) => {
   return (

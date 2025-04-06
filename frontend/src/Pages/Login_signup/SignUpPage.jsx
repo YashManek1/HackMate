@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import image1 from "../Assets/image1.jpg"; // Placeholder for the image
+import image1 from "../../Assets/image1.jpg" // Placeholder for the image
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
